@@ -23,6 +23,10 @@ export interface Character {
     skills: string[];
     tools: string[];
     languages: string[];
+    personalityTrait?: string;
+    ideal?: string;
+    bond?: string;
+    flaw?: string;
   };
   feats: string[];
   spellcasting?: SpellcastingData;
@@ -220,4 +224,26 @@ export interface DnDClass {
   choices?: ClassChoice[];
   spellcasting?: ClassSpellcasting;
   martialTier: 'full' | 'half' | 'none';
+}
+
+// Background types
+
+export interface DnDBackground {
+  name: string;
+  description: string;
+  suggestedAbilityScores: AbilityScoreKey[];
+  optionalLanguage: string;
+  featSuggestions: string[];
+  skillProficiencies: string[];
+  toolProficiency: string;
+  equipment: string;
+  optionalFeature: {
+    name: string;
+    description: string;
+  };
+  /** Personality/Ideal/Bond/Flaw tables (d6 rolls) */
+  personalityTraits: string[];
+  ideals: string[];
+  bonds: string[];
+  flaws: string[];
 }

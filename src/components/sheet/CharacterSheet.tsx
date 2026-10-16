@@ -1,6 +1,7 @@
 import { useCharacterStore } from '../../store/characterStore';
 import RaceTab from './tabs/RaceTab';
 import ClassTab from './tabs/ClassTab';
+import BackgroundTab from './tabs/BackgroundTab';
 
 interface Props {
   characterId: string;
@@ -27,6 +28,14 @@ export default function CharacterSheet({ characterId }: Props) {
 
   const activeTab = character.activeTab || 'overview';
 
+  // Compute total level from class levels
+  const totalLevel = character.classes.reduce((s, c) => s + c.level, 0) || 1;
+
+  // Keep top-level `level` in sync with sum of class levels
+  if (character.level !== totalLevel) {
+    updateCharacter(character.id, { level: totalLevel });
+  }
+
   return (
     <div>
       {/* Header */}
@@ -40,7 +49,7 @@ export default function CharacterSheet({ characterId }: Props) {
         />
         <div className="flex items-center gap-3 text-sm text-gray-600">
           <span className="px-2 py-0.5 bg-ink text-parchment rounded">
-            Level {character.level}
+            Level {totalLevel}
           </span>
           <span>{character.race.name || 'No race'}</span>
           <span>·</span>
@@ -76,9 +85,13 @@ export default function CharacterSheet({ characterId }: Props) {
         {activeTab === 'overview' && <OverviewTab characterId={characterId} />}
         {activeTab === 'race' && <RaceTab characterId={characterId} />}
         {activeTab === 'class' && <ClassTab characterId={characterId} />}
+        {activeTab === 'background' && (
+          <BackgroundTab characterId={characterId} />
+        )}
         {activeTab !== 'overview' &&
           activeTab !== 'race' &&
-          activeTab !== 'class' && (
+          activeTab !== 'class' &&
+          activeTab !== 'background' && (
             <ComingSoon
               tabName={TABS.find((t) => t.id === activeTab)?.label ?? ''}
             />

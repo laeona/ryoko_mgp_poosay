@@ -220,3 +220,26 @@ export function getSpellAttackBonus(character: Character): number | undefined {
   const prof = getProficiencyBonus(character.level);
   return prof + mod;
 }
+
+export function getHitDiceType(character: Character): number {
+  // Use the hit die of the class with the most levels (primary class)
+  if (character.classes.length === 0) return 8;
+  const primary = [...character.classes].sort((a, b) => b.level - a.level)[0];
+  const cls = getClass(primary.className);
+  return cls?.hitDie ?? 8;
+}
+
+export function rollHitDie(character: Character): {
+  roll: number;
+  conMod: number;
+  total: number;
+  dieType: number;
+} | null {
+  if (character.combat.hitDiceUsed >= character.combat.hitDiceTotal) return null;
+  const dieType = getHitDiceType(character);
+  const roll = Math.floor(Math.random() * dieType) + 1;
+  const totals = getTotalAbilityScores(character);
+  const conMod = getModifier(totals.constitution);
+  const total = Math.max(1, roll + conMod);
+  return { roll, conMod, total, dieType };
+}

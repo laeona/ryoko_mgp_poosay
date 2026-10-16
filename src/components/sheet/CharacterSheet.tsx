@@ -11,6 +11,9 @@ import InventoryTab from './tabs/InventoryTab';
 import AdvancedWeaponMasteryTab from './tabs/AdvancedWeaponMasteryTab';
 import TamerTab from './tabs/TamerTab';
 import LevelUpWizard from './LevelUpWizard';
+import RestMenu from './RestMenu';
+import ResourcesPanel from './tabs/ResourcesPanel';
+import HitDicePanel from './HitDicePanel';
 
 interface Props {
   characterId: string;
@@ -71,14 +74,17 @@ export default function CharacterSheet({ characterId }: Props) {
               ? character.classes.map((c) => c.className).join(' / ')
               : 'No class'}
           </span>
-          {character.classes.length > 0 && totalLevel < 20 && (
-            <button
-              onClick={() => setShowLevelUp(true)}
-              className="ml-auto px-3 py-1 text-xs bg-jade text-white rounded hover:bg-green-800 transition font-semibold"
-            >
-              ⬆️ Level Up
-            </button>
-          )}
+          <div className="ml-auto flex gap-2">
+            <RestMenu characterId={characterId} />
+            {character.classes.length > 0 && totalLevel < 20 && (
+              <button
+                onClick={() => setShowLevelUp(true)}
+                className="px-3 py-1 text-xs bg-jade text-white rounded hover:bg-green-800 transition font-semibold"
+              >
+                ⬆️ Level Up
+              </button>
+            )}
+          </div>
         </div>
       </div>
 
@@ -263,6 +269,12 @@ function OverviewTab({ characterId }: { characterId: string }) {
             />
           </div>
         </div>
+      </div>
+
+      <HitDicePanel characterId={characterId} />
+
+      <div className="lg:col-span-2">
+        <ResourcesPanel characterId={characterId} />
       </div>
     </div>
   );

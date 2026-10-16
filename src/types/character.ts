@@ -36,6 +36,7 @@ export interface Character {
   martialLevel: number;
   inventory: InventoryItem[];
   prostheses: string[];
+  currency: { gp: number; sp: number; cp: number };
   combat: CombatData;
   resources: Resource[];
   features: Feature[];
@@ -83,12 +84,26 @@ export interface Companion {
   notes: string;
 }
 
+export type ItemCategory =
+  | 'weapon'
+  | 'armor'
+  | 'gear'
+  | 'magic'
+  | 'prosthesis'
+  | 'other';
+
 export interface InventoryItem {
   id: string;
   name: string;
   quantity: number;
   weight: number;
   notes: string;
+  category?: ItemCategory;
+  equipped?: boolean;
+  attuned?: boolean;
+  description?: string;
+  damage?: string;
+  properties?: string[];
 }
 
 export interface CombatData {
@@ -287,4 +302,30 @@ export interface DnDSpell {
   benderElement?: 'air' | 'earth' | 'fire' | 'water';
   /** Higher-level cast notes, e.g., "At Higher Levels. ..." */
   atHigherLevels?: string;
+}
+
+// Advanced Weapon Mastery types
+
+export type WeaponProperty =
+  | 'Ammunition'
+  | 'Finesse'
+  | 'Heavy'
+  | 'Impact'
+  | 'Light'
+  | 'Loading'
+  | 'Pugilist'
+  | 'Reach'
+  | 'Scourge'
+  | 'Shield'
+  | 'Thrown'
+  | 'Versatile';
+
+export interface AdvancedTechnique {
+  /** Unique key — use `${tree}-t${tier}-${kebab-name}` */
+  id: string;
+  name: string;
+  description: string;
+  tier: 1 | 2 | 3 | 4;
+  tree: WeaponProperty;
+  prerequisite?: string;
 }

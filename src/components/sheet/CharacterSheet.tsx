@@ -6,6 +6,8 @@ import AbilitiesTab from './tabs/AbilitiesTab';
 import FeaturesTab from './tabs/FeaturesTab';
 import FeatsTab from './tabs/FeatsTab';
 import SpellsTab from './tabs/SpellsTab';
+import InventoryTab from './tabs/InventoryTab';
+import AdvancedWeaponMasteryTab from './tabs/AdvancedWeaponMasteryTab';
 
 interface Props {
   characterId: string;
@@ -20,6 +22,7 @@ const TABS = [
   { id: 'spells', label: 'Spells' },
   { id: 'features', label: 'Features' },
   { id: 'feats', label: 'Feats' },
+  { id: 'weapon-mastery', label: 'Weapon Mastery' },
   { id: 'inventory', label: 'Inventory' },
 ] as const;
 
@@ -103,7 +106,9 @@ export default function CharacterSheet({ characterId }: Props) {
           activeTab !== 'abilities' &&
           activeTab !== 'features' &&
           activeTab !== 'feats' &&
-          activeTab !== 'spells' && (
+          activeTab !== 'spells' &&
+          activeTab !== 'weapon-mastery' &&
+          activeTab !== 'inventory' && (
             <ComingSoon
               tabName={TABS.find((t) => t.id === activeTab)?.label ?? ''}
             />
@@ -113,6 +118,12 @@ export default function CharacterSheet({ characterId }: Props) {
         )}
         {activeTab === 'feats' && <FeatsTab characterId={characterId} />}
         {activeTab === 'spells' && <SpellsTab characterId={characterId} />}
+        {activeTab === 'weapon-mastery' && (
+          <AdvancedWeaponMasteryTab characterId={characterId} />
+        )}
+        {activeTab === 'inventory' && (
+          <InventoryTab characterId={characterId} />
+        )}
       </div>
     </div>
   );

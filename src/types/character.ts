@@ -76,11 +76,16 @@ export interface Companion {
   id: string;
   name: string;
   creatureType: string;
-  cr: number;
+  cr: number; // use 0.125, 0.25, 0.5, 1, 2, 3, 4, 5, 6
+  size: 'Tiny' | 'Small' | 'Medium' | 'Large' | 'Huge';
   maxHP: number;
   currentHP: number;
+  tempHP?: number;
   ac: number;
+  speed: string;
   improvements: string[];
+  senseiStrikes?: number;
+  senseiTechniques?: string[];
   notes: string;
 }
 

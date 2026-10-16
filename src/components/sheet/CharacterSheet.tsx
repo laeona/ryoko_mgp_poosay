@@ -8,6 +8,7 @@ import FeatsTab from './tabs/FeatsTab';
 import SpellsTab from './tabs/SpellsTab';
 import InventoryTab from './tabs/InventoryTab';
 import AdvancedWeaponMasteryTab from './tabs/AdvancedWeaponMasteryTab';
+import TamerTab from './tabs/TamerTab';
 
 interface Props {
   characterId: string;
@@ -23,6 +24,7 @@ const TABS = [
   { id: 'features', label: 'Features' },
   { id: 'feats', label: 'Feats' },
   { id: 'weapon-mastery', label: 'Weapon Mastery' },
+  { id: 'tamer', label: 'Tamer' },
   { id: 'inventory', label: 'Inventory' },
 ] as const;
 
@@ -108,6 +110,7 @@ export default function CharacterSheet({ characterId }: Props) {
           activeTab !== 'feats' &&
           activeTab !== 'spells' &&
           activeTab !== 'weapon-mastery' &&
+          activeTab !== 'tamer' &&
           activeTab !== 'inventory' && (
             <ComingSoon
               tabName={TABS.find((t) => t.id === activeTab)?.label ?? ''}
@@ -121,6 +124,7 @@ export default function CharacterSheet({ characterId }: Props) {
         {activeTab === 'weapon-mastery' && (
           <AdvancedWeaponMasteryTab characterId={characterId} />
         )}
+        {activeTab === 'tamer' && <TamerTab characterId={characterId} />}
         {activeTab === 'inventory' && (
           <InventoryTab characterId={characterId} />
         )}

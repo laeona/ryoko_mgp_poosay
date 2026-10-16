@@ -257,3 +257,34 @@ export interface DnDFeat {
     subrace?: string;
   };
 }
+
+// Spell types
+
+export type SpellSchool =
+  | 'Abjuration'
+  | 'Biomancy'
+  | 'Conjuration'
+  | 'Divination'
+  | 'Enchantment'
+  | 'Evocation'
+  | 'Illusion'
+  | 'Necromancy'
+  | 'Transmutation';
+
+export interface DnDSpell {
+  name: string;
+  level: number; // 0 for cantrips
+  school: SpellSchool;
+  castingTime: string;
+  range: string;
+  components: string; // e.g., "V, S", "V, S, M (a bit of fleece)"
+  duration: string;
+  concentration: boolean;
+  ritual: boolean;
+  classes: string[]; // class names that have this spell
+  description: string;
+  /** Bender-only: which elemental affinity list this spell belongs to */
+  benderElement?: 'air' | 'earth' | 'fire' | 'water';
+  /** Higher-level cast notes, e.g., "At Higher Levels. ..." */
+  atHigherLevels?: string;
+}

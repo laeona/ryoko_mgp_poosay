@@ -5,6 +5,7 @@ import BackgroundTab from './tabs/BackgroundTab';
 import AbilitiesTab from './tabs/AbilitiesTab';
 import FeaturesTab from './tabs/FeaturesTab';
 import FeatsTab from './tabs/FeatsTab';
+import SpellsTab from './tabs/SpellsTab';
 
 interface Props {
   characterId: string;
@@ -101,7 +102,8 @@ export default function CharacterSheet({ characterId }: Props) {
           activeTab !== 'background' &&
           activeTab !== 'abilities' &&
           activeTab !== 'features' &&
-          activeTab !== 'feats' && (
+          activeTab !== 'feats' &&
+          activeTab !== 'spells' && (
             <ComingSoon
               tabName={TABS.find((t) => t.id === activeTab)?.label ?? ''}
             />
@@ -110,6 +112,7 @@ export default function CharacterSheet({ characterId }: Props) {
           <FeaturesTab characterId={characterId} />
         )}
         {activeTab === 'feats' && <FeatsTab characterId={characterId} />}
+        {activeTab === 'spells' && <SpellsTab characterId={characterId} />}
       </div>
     </div>
   );

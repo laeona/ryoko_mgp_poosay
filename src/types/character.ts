@@ -243,3 +243,17 @@ export interface DnDBackground {
   bonds: string[];
   flaws: string[];
 }
+
+// Feat types
+
+export interface DnDFeat {
+  name: string;
+  description: string;
+  prerequisite?: string;
+  type: 'general' | 'racial';
+  /** For racial feats only: which race/subrace qualifies */
+  racialRequirement?: {
+    race: string;
+    subrace?: string;
+  };
+}

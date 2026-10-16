@@ -3,6 +3,8 @@ import RaceTab from './tabs/RaceTab';
 import ClassTab from './tabs/ClassTab';
 import BackgroundTab from './tabs/BackgroundTab';
 import AbilitiesTab from './tabs/AbilitiesTab';
+import FeaturesTab from './tabs/FeaturesTab';
+import FeatsTab from './tabs/FeatsTab';
 
 interface Props {
   characterId: string;
@@ -16,6 +18,7 @@ const TABS = [
   { id: 'abilities', label: 'Abilities' },
   { id: 'spells', label: 'Spells' },
   { id: 'features', label: 'Features' },
+  { id: 'feats', label: 'Feats' },
   { id: 'inventory', label: 'Inventory' },
 ] as const;
 
@@ -96,11 +99,17 @@ export default function CharacterSheet({ characterId }: Props) {
           activeTab !== 'race' &&
           activeTab !== 'class' &&
           activeTab !== 'background' &&
-          activeTab !== 'abilities' && (
+          activeTab !== 'abilities' &&
+          activeTab !== 'features' &&
+          activeTab !== 'feats' && (
             <ComingSoon
               tabName={TABS.find((t) => t.id === activeTab)?.label ?? ''}
             />
           )}
+        {activeTab === 'features' && (
+          <FeaturesTab characterId={characterId} />
+        )}
+        {activeTab === 'feats' && <FeatsTab characterId={characterId} />}
       </div>
     </div>
   );

@@ -1,0 +1,212 @@
+import { useState } from 'react';
+import { useCharacterStore } from '../../../store/characterStore';
+import { FEATS } from '../../../data/feats';
+import type { DnDFeat } from '../../../types/character';
+
+interface Props {
+  characterId: string;
+}
+
+export default function FeatsTab({ characterId }: Props) {
+  const character = useCharacterStore((s) =>
+    s.characters.find((c) => c.id === characterId)
+  );
+  const updateCharacter = useCharacterStore((s) => s.updateCharacter);
+  const [query, setQuery] = useState('');
+  const [filter, setFilter] = useState<'all' | 'general' | 'racial' | 'owned'>(
+    'all'
+  );
+
+  if (!character) return null;
+
+  const owned = character.feats ?? [];
+  const qualifies = (feat: DnDFeat): boolean => {
+    if (feat.type !== 'racial' || !feat.racialRequirement) return true;
+    const req = feat.racialRequirement;
+    if (character.race.name !== req.race) return false;
+    if (req.subrace && character.race.subrace !== req.subrace) return false;
+    return true;
+  };
+
+  const toggleFeat = (name: string) => {
+    const has = owned.includes(name);
+    updateCharacter(character.id, {
+      feats: has ? owned.filter((f) => f !== name) : [...owned, name],
+    });
+  };
+
+  const filtered = FEATS.filter((f) => {
+    if (filter === 'general' && f.type !== 'general') return false;
+    if (filter === 'racial' && f.type !== 'racial') return false;
+    if (filter === 'owned' && !owned.includes(f.name)) return false;
+    if (query.trim()) {
+      const q = query.toLowerCase();
+      return (
+        f.name.toLowerCase().includes(q) ||
+        f.description.toLowerCase().includes(q) ||
+        (f.prerequisite ?? '').toLowerCase().includes(q)
+      );
+    }
+    return true;
+  });
+
+  const generalCount = FEATS.filter((f) => f.type === 'general').length;
+  const racialCount = FEATS.filter((f) => f.type === 'racial').length;
+
+  return (
+    <div className="space-y-4">
+      {/* Filters */}
+      <div className="bg-white rounded-lg shadow p-4 space-y-3">
+        <input
+          type="text"
+          value={query}
+          onChange={(e) => setQuery(e.target.value)}
+          placeholder="Search feats..."
+          className="w-full border border-gray-300 rounded px-3 py-2 outline-none focus:border-ember"
+        />
+        <div className="flex flex-wrap gap-2">
+          <FilterChip
+            label="All"
+            count={FEATS.length}
+            active={filter === 'all'}
+            onClick={() => setFilter('all')}
+          />
+          <FilterChip
+            label="General"
+            count={generalCount}
+            active={filter === 'general'}
+            onClick={() => setFilter('general')}
+          />
+          <FilterChip
+            label="Racial"
+            count={racialCount}
+            active={filter === 'racial'}
+            onClick={() => setFilter('racial')}
+          />
+          <FilterChip
+            label="Owned"
+            count={owned.length}
+            active={filter === 'owned'}
+            onClick={() => setFilter('owned')}
+          />
+        </div>
+      </div>
+
+      {/* Feat list */}
+      {filtered.length === 0 ? (
+        <div className="bg-white rounded-lg shadow p-12 text-center text-gray-500">
+          No feats match your search.
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+          {filtered.map((feat) => (
+            <FeatCard
+              key={feat.name}
+              feat={feat}
+              owned={owned.includes(feat.name)}
+              qualifies={qualifies(feat)}
+              onToggle={() => toggleFeat(feat.name)}
+            />
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
+/* ---------- Sub-components ---------- */
+
+function FilterChip({
+  label,
+  count,
+  active,
+  onClick,
+}: {
+  label: string;
+  count: number;
+  active: boolean;
+  onClick: () => void;
+}) {
+  return (
+    <button
+      onClick={onClick}
+      className={`px-3 py-1 text-sm rounded-full border transition ${
+        active
+          ? 'bg-ember text-white border-ember'
+          : 'bg-white border-gray-300 hover:border-ember'
+      }`}
+    >
+      {label}{' '}
+      <span className={`text-xs ${active ? 'text-white/80' : 'text-gray-500'}`}>
+        ({count})
+      </span>
+    </button>
+  );
+}
+
+function FeatCard({
+  feat,
+  owned,
+  qualifies,
+  onToggle,
+}: {
+  feat: DnDFeat;
+  owned: boolean;
+  qualifies: boolean;
+  onToggle: () => void;
+}) {
+  return (
+    <div
+      className={`bg-white rounded-lg shadow p-4 border-2 transition ${
+        owned
+          ? 'border-ember'
+          : qualifies
+            ? 'border-transparent hover:border-gray-300'
+            : 'border-transparent opacity-60'
+      }`}
+    >
+      <div className="flex items-start justify-between gap-3 mb-2">
+        <div className="flex-1">
+          <div className="flex items-center gap-2 flex-wrap">
+            <h3 className="font-bold text-lg">{feat.name}</h3>
+            <span
+              className={`text-xs px-2 py-0.5 rounded ${
+                feat.type === 'racial'
+                  ? 'bg-purple-600 text-white'
+                  : 'bg-gray-200 text-gray-700'
+              }`}
+            >
+              {feat.type === 'racial' ? 'Racial' : 'General'}
+            </span>
+          </div>
+          {feat.prerequisite && (
+            <p className="text-xs text-gray-500 italic mt-0.5">
+              Prerequisite: {feat.prerequisite}
+            </p>
+          )}
+        </div>
+        <button
+          onClick={onToggle}
+          disabled={!qualifies}
+          className={`px-3 py-1 text-xs rounded font-semibold whitespace-nowrap transition ${
+            owned
+              ? 'bg-ember text-white hover:bg-red-700'
+              : qualifies
+                ? 'bg-jade text-white hover:bg-green-800'
+                : 'bg-gray-100 text-gray-400 cursor-not-allowed'
+          }`}
+        >
+          {owned ? 'Remove' : 'Add'}
+        </button>
+      </div>
+      <p className="text-sm text-gray-700">{feat.description}</p>
+      {!qualifies && feat.racialRequirement && (
+        <p className="text-xs text-red-500 mt-2 italic">
+          Requires: {feat.racialRequirement.race}
+          {feat.racialRequirement.subrace &&
+            ` (${feat.racialRequirement.subrace})`}
+        </p>
+      )}
+    </div>
+  );
+}

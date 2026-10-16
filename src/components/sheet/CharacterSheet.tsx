@@ -14,6 +14,7 @@ import LevelUpWizard from './LevelUpWizard';
 import RestMenu from './RestMenu';
 import ResourcesPanel from './tabs/ResourcesPanel';
 import HitDicePanel from './HitDicePanel';
+import ActionsPanel from './ActionsPanel';
 
 interface Props {
   characterId: string;
@@ -275,6 +276,10 @@ function OverviewTab({ characterId }: { characterId: string }) {
 
       <div className="lg:col-span-2">
         <ResourcesPanel characterId={characterId} />
+      </div>
+
+      <div className="lg:col-span-2">
+        <ActionsPanel characterId={characterId} />
       </div>
     </div>
   );

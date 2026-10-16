@@ -509,6 +509,77 @@ export const SPELLS: DnDSpell[] = [
       'Move or manipulate water in a 5-ft cube. Choose one: instant movement/animation, shape into simple forms, change colour/opacity, or freeze (if no creature inside).',
   },
 
+    {
+    name: 'Dancing Lights',
+    level: 0,
+    school: 'Evocation',
+    castingTime: '1 action',
+    range: '120 feet',
+    components: 'V, S, M (a bit of phosphorus or wychwood, or a glowworm)',
+    duration: 'Concentration, up to 1 minute',
+    concentration: true,
+    ritual: false,
+    classes: ['Bard', 'Sorcerer', 'Wizard'],
+    description:
+      'Create up to 4 torch-sized lights (or one Medium humanoid shape) within range. Bonus action to move them up to 60 ft to a point in range.',
+  },
+  {
+    name: 'Friends',
+    level: 0,
+    school: 'Enchantment',
+    castingTime: '1 action',
+    range: 'Self',
+    components: 'S, M (a small amount of makeup applied to the face as this spell is cast)',
+    duration: 'Concentration, up to 1 minute',
+    concentration: true,
+    ritual: false,
+    classes: ['Bard', 'Sorcerer', 'Warlock', 'Wizard'],
+    description:
+      'Advantage on all Charisma checks directed at one creature of your choice. When it ends, the creature realizes you used magic and becomes hostile.',
+  },
+  {
+    name: 'Message',
+    level: 0,
+    school: 'Transmutation',
+    castingTime: '1 action',
+    range: '120 feet',
+    components: 'V, S, M (a short piece of copper wire)',
+    duration: '1 round',
+    concentration: false,
+    ritual: false,
+    classes: ['Bard', 'Sorcerer', 'Wizard'],
+    description:
+      'Whisper a message to a creature. Only the target hears it and can reply in a whisper only you hear.',
+  },
+  {
+    name: 'True Strike',
+    level: 0,
+    school: 'Divination',
+    castingTime: '1 action',
+    range: '30 feet',
+    components: 'S',
+    duration: 'Concentration, up to 1 round',
+    concentration: true,
+    ritual: false,
+    classes: ['Bard', 'Sorcerer', 'Warlock', 'Wizard'],
+    description:
+      'You point at a target. On your next turn, you have advantage on your first attack roll against the target.',
+  },
+  {
+    name: 'Blade Ward',
+    level: 0,
+    school: 'Abjuration',
+    castingTime: '1 action',
+    range: 'Self',
+    components: 'V, S',
+    duration: '1 round',
+    concentration: false,
+    ritual: false,
+    classes: ['Bard', 'Sorcerer', 'Warlock', 'Wizard'],
+    description:
+      'Until end of your next turn, you have resistance to bludgeoning, piercing, and slashing damage from weapon attacks.',
+  },
+
   // ============================================================
   // 1ST LEVEL
   // ============================================================
@@ -1142,6 +1213,63 @@ export const SPELLS: DnDSpell[] = [
     description:
       'DEX save or 3d6 fire in a 15-ft cone; half on success. Ignites unattended flammables.',
     atHigherLevels: '+1d6 damage per slot level above 1st.',
+  },
+
+    {
+    name: 'Comprehend Languages',
+    level: 1,
+    school: 'Divination',
+    castingTime: '1 action',
+    range: 'Self',
+    components: 'V, S, M (a pinch of soot and salt)',
+    duration: '1 hour',
+    concentration: false,
+    ritual: true,
+    classes: ['Bard', 'Sorcerer', 'Warlock', 'Wizard'],
+    description:
+      'Understand the literal meaning of any spoken language you hear for the duration. Also read any written language you touch, but you must be touching the surface the writing is on.',
+  },
+  {
+    name: 'Disguise Self',
+    level: 1,
+    school: 'Illusion',
+    castingTime: '1 action',
+    range: 'Self',
+    components: 'V, S',
+    duration: '1 hour',
+    concentration: false,
+    ritual: false,
+    classes: ['Bard', 'Sorcerer', 'Wizard'],
+    description:
+      'Change your appearance (including clothing/equipment) to look different. 1 ft shorter or taller. Physical inspection reveals the illusion on a successful Investigation check.',
+  },
+  {
+    name: 'Illusory Script',
+    level: 1,
+    school: 'Illusion',
+    castingTime: '1 minute',
+    range: 'Touch',
+    components: 'S, M (a lead-based ink worth at least 10 gp)',
+    duration: '10 days',
+    concentration: false,
+    ritual: true,
+    classes: ['Bard', 'Warlock', 'Wizard'],
+    description:
+      'Write on parchment, paper, or other suitable material. Only designated creatures can read it; others see it as unintelligible script or a different message.',
+  },
+  {
+    name: 'Unseen Servant',
+    level: 1,
+    school: 'Conjuration',
+    castingTime: '1 action',
+    range: '60 feet',
+    components: 'V, S, M (a piece of string and a bit of wood)',
+    duration: '1 hour',
+    concentration: false,
+    ritual: true,
+    classes: ['Bard', 'Warlock', 'Wizard'],
+    description:
+      'An invisible, mindless, shapeless force performs simple tasks at your command: fetch, clean, mend, fold, light fires, serve at table, etc. AC 10, 1 HP, STR 2.',
   },
 
   // ============================================================
@@ -1884,6 +2012,121 @@ export const SPELLS: DnDSpell[] = [
     atHigherLevels: '+1d8 healing per slot level above 2nd.',
   },
 
+    {
+    name: 'Cloud of Daggers',
+    level: 2,
+    school: 'Conjuration',
+    castingTime: '1 action',
+    range: '60 feet (5-foot cube)',
+    components: 'V, S, M (a sliver of glass)',
+    duration: 'Concentration, up to 1 minute',
+    concentration: true,
+    ritual: false,
+    classes: ['Bard', 'Sorcerer', 'Warlock', 'Wizard'],
+    description:
+      'Fill a 5-ft cube with spinning daggers. A creature takes 4d4 slashing damage when it enters the area or starts its turn there.',
+    atHigherLevels: '+2d4 damage per slot level above 2nd.',
+  },
+  {
+    name: 'Crown of Madness',
+    level: 2,
+    school: 'Enchantment',
+    castingTime: '1 action',
+    range: '120 feet',
+    components: 'V, S',
+    duration: 'Concentration, up to 1 minute',
+    concentration: true,
+    ritual: false,
+    classes: ['Bard', 'Sorcerer', 'Warlock', 'Wizard'],
+    description:
+      'Humanoid WIS save or charmed. Before each of its turns, it must use its action to make one melee attack against a creature of your choice other than itself. Repeat save each turn.',
+  },
+  {
+    name: 'Enthrall',
+    level: 2,
+    school: 'Enchantment',
+    castingTime: '1 action',
+    range: '60 feet',
+    components: 'V, S',
+    duration: '1 minute',
+    concentration: false,
+    ritual: false,
+    classes: ['Bard', 'Warlock'],
+    description:
+      'WIS save: choose creatures in a 30-ft radius of a point you choose. Each target has disadvantage on Perception checks and can\'t attack anyone other than you.',
+  },
+  {
+    name: 'Knock',
+    level: 2,
+    school: 'Transmutation',
+    castingTime: '1 action',
+    range: '60 feet',
+    components: 'V',
+    duration: 'Instantaneous',
+    concentration: false,
+    ritual: false,
+    classes: ['Bard', 'Sorcerer', 'Wizard'],
+    description:
+      'Loud knock audible 300 ft. Unlock or unstick one object (door, box, chest, etc.). Suppress arcane lock for 10 minutes. Also opens locked/barred doors.',
+  },
+  {
+    name: 'Magic Mouth',
+    level: 2,
+    school: 'Illusion',
+    castingTime: '1 minute',
+    range: '30 feet',
+    components: 'V, S, M (a small bit of honeycomb and jade dust worth 10 gp)',
+    duration: 'Until dispelled',
+    concentration: false,
+    ritual: true,
+    classes: ['Bard', 'Wizard'],
+    description:
+      'Imprint a message on an object. When a trigger condition occurs, an illusory mouth appears and speaks the message (up to 25 words).',
+  },
+  {
+    name: 'Phantasmal Force',
+    level: 2,
+    school: 'Illusion',
+    castingTime: '1 action',
+    range: '60 feet (10-foot cube)',
+    components: 'V, S, M (a bit of fleece)',
+    duration: 'Concentration, up to 1 minute',
+    concentration: true,
+    ritual: false,
+    classes: ['Bard', 'Sorcerer', 'Wizard'],
+    description:
+      'INT save or you create a phantasmal object/creature visible only to the target. It can deal 1d6 psychic damage if the illusion is dangerous and appears to threaten it.',
+  },
+  {
+    name: 'Shatter',
+    level: 2,
+    school: 'Evocation',
+    castingTime: '1 action',
+    range: '60 feet (10-foot radius)',
+    components: 'V, S, M (a chip of mica)',
+    duration: 'Instantaneous',
+    concentration: false,
+    ritual: false,
+    classes: ['Bard', 'Sorcerer', 'Warlock', 'Wizard'],
+    description:
+      'CON save or 3d8 thunder in a 10-ft radius, half on success. Creatures made of inorganic material (stone, crystal, metal) have disadvantage on the save.',
+    atHigherLevels: '+1d8 damage per slot level above 2nd.',
+  },
+  {
+    name: 'Zone of Truth',
+    level: 2,
+    school: 'Enchantment',
+    castingTime: '1 action',
+    range: '60 feet (15-foot radius)',
+    components: 'V, S',
+    duration: '10 minutes',
+    concentration: false,
+    ritual: false,
+    classes: ['Bard', 'Cleric', 'Paladin'],
+    description:
+      'A 15-ft radius sphere where creatures can\'t lie. CHA save to avoid; a creature can choose to fail. On failure, can\'t speak a deliberate lie while in the area. You know if it succeeded on the save.',
+  },
+
   // ============================================================
   // 3RD LEVEL
   // ============================================================
@@ -2371,6 +2614,94 @@ export const SPELLS: DnDSpell[] = [
       'Freezing rain and sleet heavily obscures. Ground is difficult terrain. DEX save or fall prone when casting and when entering/starting turn. Concentration spells of creatures in the area are at disadvantage.',
   },
 
+    {
+    name: 'Hypnotic Pattern',
+    level: 3,
+    school: 'Illusion',
+    castingTime: '1 action',
+    range: '120 feet (30-foot cube)',
+    components: 'S, M (a glowing stick of incense or a crystal vial filled with phosphorescent material)',
+    duration: 'Concentration, up to 1 minute',
+    concentration: true,
+    ritual: false,
+    classes: ['Bard', 'Sorcerer', 'Warlock', 'Wizard'],
+    description:
+      'WIS save or charmed and incapacitated in a 30-ft cube. Speed 0. Ends if the creature takes damage or someone shakes it.',
+  },
+  {
+    name: 'Major Image',
+    level: 3,
+    school: 'Illusion',
+    castingTime: '1 action',
+    range: '120 feet (20-foot cube)',
+    components: 'V, S, M (a bit of fleece)',
+    duration: 'Concentration, up to 10 minutes',
+    concentration: true,
+    ritual: false,
+    classes: ['Bard', 'Sorcerer', 'Warlock', 'Wizard'],
+    description:
+      'Create an image of an object, creature, or phenomenon no larger than a 20-ft cube. Includes sound, smell, and temperature. Action to move it; can make it seem real.',
+    atHigherLevels: 'At 6th+, lasts until dispelled and doesn\'t require concentration.',
+  },
+  {
+    name: 'Sending',
+    level: 3,
+    school: 'Evocation',
+    castingTime: '1 action',
+    range: 'Unlimited',
+    components: 'V, S, M (a short piece of fine copper wire)',
+    duration: '1 round',
+    concentration: false,
+    ritual: false,
+    classes: ['Bard', 'Cleric', 'Wizard'],
+    description:
+      'Send a 25-word message to a creature you are familiar with. It can reply with 25 words. Works across any distance and even to other planes.',
+  },
+  {
+    name: 'Clairvoyance',
+    level: 3,
+    school: 'Divination',
+    castingTime: '10 minutes',
+    range: '1 mile',
+    components: 'V, S, M (a focus worth at least 100 gp, either a jeweled horn for hearing or a glass eye for seeing)',
+    duration: 'Concentration, up to 10 minutes',
+    concentration: true,
+    ritual: false,
+    classes: ['Bard', 'Cleric', 'Sorcerer', 'Wizard', 'Bender'],
+    benderElement: 'water',
+    description:
+      'Create an invisible sensor within 1 mile at a location you choose (a place you\'ve seen or an obvious location). Choose seeing or hearing. Switch between as an action.',
+  },
+  {
+    name: 'Glyph of Warding',
+    level: 3,
+    school: 'Abjuration',
+    castingTime: '1 hour',
+    range: 'Touch',
+    components: 'V, S, M (incense and powdered diamond worth at least 200 gp, consumed)',
+    duration: 'Until dispelled or triggered',
+    concentration: false,
+    ritual: false,
+    classes: ['Bard', 'Cleric', 'Wizard'],
+    description:
+      'Inscribe a glyph on a surface or object. When triggered by a specified condition, it either explodes (5d8 acid/cold/fire/lightning/thunder) or casts a spell of 3rd level or lower.',
+    atHigherLevels: '+1d8 explosive damage per slot level above 3rd, or higher-level spell can be stored.',
+  },
+  {
+    name: 'Feign Death',
+    level: 3,
+    school: 'Necromancy',
+    castingTime: '1 action',
+    range: 'Touch',
+    components: 'V, S, M (a pinch of graveyard dirt)',
+    duration: '1 hour',
+    concentration: false,
+    ritual: true,
+    classes: ['Bard', 'Cleric', 'Druid', 'Wizard'],
+    description:
+      'Willing creature appears dead: blinded, incapacitated, speed 0, resistance to all damage except psychic, immune to disease and poison. Ages 0 time. Seems dead to magical inspection.',
+  },
+
   // ============================================================
   // 4TH LEVEL
   // ============================================================
@@ -2757,6 +3088,35 @@ export const SPELLS: DnDSpell[] = [
     atHigherLevels: 'Higher-CR options with higher slot levels.',
   },
 
+    {
+    name: 'Compulsion',
+    level: 4,
+    school: 'Enchantment',
+    castingTime: '1 action',
+    range: '30 feet',
+    components: 'V, S',
+    duration: 'Concentration, up to 1 minute',
+    concentration: true,
+    ritual: false,
+    classes: ['Bard'],
+    description:
+      'WIS save or each target must use its movement on each of its turns to move in a direction of your choice. It can take its action before moving.',
+  },
+  {
+    name: 'Hallucinatory Terrain',
+    level: 4,
+    school: 'Illusion',
+    castingTime: '10 minutes',
+    range: '300 feet (150-foot cube)',
+    components: 'V, S, M (a stone, a twig, and a bit of green plant)',
+    duration: '24 hours',
+    concentration: false,
+    ritual: false,
+    classes: ['Bard', 'Druid', 'Warlock', 'Wizard'],
+    description:
+      'Make natural terrain in a 150-ft cube look, sound, and smell like another sort of natural terrain. Physical contact reveals the illusion.',
+  },
+
   // ============================================================
   // 5TH LEVEL
   // ============================================================
@@ -3073,7 +3433,38 @@ export const SPELLS: DnDSpell[] = [
       'Summon an elemental (CR 5 or lower) that obeys your verbal commands. If you lose concentration, it becomes hostile.',
     atHigherLevels: 'Higher-CR elementals with higher slot levels.',
   },
-    // ============================================================
+
+    {
+    name: 'Dream',
+    level: 5,
+    school: 'Illusion',
+    castingTime: '1 minute',
+    range: 'Special',
+    components: 'V, S, M (a handful of sand, a dab of ink, and a writing quill plucked from a sleeping bird)',
+    duration: '8 hours',
+    concentration: false,
+    ritual: false,
+    classes: ['Bard', 'Warlock', 'Wizard'],
+    description:
+      'Target must be on the same plane. You or a willing creature you touch enters a trance as a messenger. Target WIS save: on fail, takes 3d6 psychic damage and gains no benefit from its rest. You can shape the dream.',
+  },
+  {
+    name: 'Modify Memory',
+    level: 5,
+    school: 'Enchantment',
+    castingTime: '1 action',
+    range: '30 feet',
+    components: 'V, S',
+    duration: 'Concentration, up to 1 minute',
+    concentration: true,
+    ritual: false,
+    classes: ['Bard', 'Wizard'],
+    description:
+      'WIS save or charmed. You can eliminate, alter, or implant a memory of an event the target experienced in the last 24 hours. Lasts up to 10 minutes of memory.',
+    atHigherLevels: '10 days at 6th, 30 days at 7th, 1 year at 8th, anytime at 9th.',
+  },
+
+  // ============================================================
   // 6TH LEVEL
   // ============================================================
   {

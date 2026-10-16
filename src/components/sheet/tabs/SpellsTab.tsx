@@ -9,6 +9,12 @@ import {
   getSpellSaveDC,
 } from '../../../utils/calculations';
 import type { DnDSpell } from '../../../types/character';
+import {
+  getCantripLimit,
+  getSpellLimit,
+  isPreparedCaster,
+} from '../../../data/spellLimits';
+import { getSpellcastingAbilityMod } from '../../../utils/calculations';
 
 interface Props {
   characterId: string;
@@ -24,35 +30,81 @@ export default function SpellsTab({ characterId }: Props) {
 
   if (!character) return null;
 
-  const sc = character.spellcasting;
+  // Derive a fallback spellcasting object if none exists.
+  // We DO NOT persist this during render — only on user action.
+  const casterClass = character.classes.find((cl) => {
+    const cls = getClass(cl.className);
+    return cls?.spellcasting;
+  });
+
+  const defaultAbility = (() => {
+    if (!casterClass) return 'intelligence' as const;
+    const cls = getClass(casterClass.className);
+    const raw = cls?.spellcasting?.ability ?? 'intelligence';
+    if (raw === 'choice') {
+      const chosen = casterClass.choices['spellcasting-ability'] as
+        | string
+        | undefined;
+      if (chosen) {
+        return chosen.toLowerCase() as
+          | 'intelligence'
+          | 'wisdom'
+          | 'charisma';
+      }
+      return 'intelligence' as const;
+    }
+    return raw as 'intelligence' | 'wisdom' | 'charisma';
+  })();
+
+  const sc = character.spellcasting ?? {
+    ability: defaultAbility,
+    spellSlots: {},
+    spellsKnown: [],
+    cantripsKnown: [],
+  };
+
+  // ---- Spell count limits ----
+  const abilityMod = getSpellcastingAbilityMod(character);
+  const cantripLimit = casterClass
+    ? getCantripLimit(
+        casterClass.className,
+        casterClass.level,
+        character.bender?.affinities
+      )
+    : 0;
+  const spellLimit = casterClass
+    ? getSpellLimit(casterClass.className, casterClass.level, abilityMod)
+    : 0;
+  const prepared = casterClass
+    ? isPreparedCaster(casterClass.className)
+    : false;
+
+  const cantripCount = sc.cantripsKnown.length;
+  const spellCount = sc.spellsKnown.length;
+  const atCantripMax = cantripCount >= cantripLimit;
+  const atSpellMax = spellCount >= spellLimit;
+
   const spellSaveDC = getSpellSaveDC(character);
   const spellAttack = getSpellAttackBonus(character);
 
-  // Ensure spellcasting data exists
-  if (!sc) {
+  // If the character has no spellcasting class at all, show a friendly message.
+  if (!casterClass && !character.spellcasting) {
     return (
       <div className="bg-white rounded-lg shadow p-8 text-center">
-        <p className="text-gray-600 mb-4">
-          This character doesn't have spellcasting yet.
+        <p className="text-gray-600">
+          This character doesn't have spellcasting. Add a spellcasting class
+          on the Class tab.
         </p>
-        <button
-          onClick={() =>
-            updateCharacter(character.id, {
-              spellcasting: {
-                ability: 'intelligence',
-                spellSlots: {},
-                spellsKnown: [],
-                cantripsKnown: [],
-              },
-            })
-          }
-          className="px-4 py-2 bg-jade text-white rounded hover:bg-green-800"
-        >
-          Enable Spellcasting
-        </button>
       </div>
     );
   }
+
+  // Helper: ensures character.spellcasting exists before any write.
+  const ensureSC = () => {
+    if (!character.spellcasting) {
+      updateCharacter(character.id, { spellcasting: sc });
+    }
+  };
 
   // Compute slots from classes
   const { slots, pact } = computeSpellSlots(character.classes);
@@ -94,10 +146,27 @@ export default function SpellsTab({ characterId }: Props) {
     return true;
   });
 
-  const toggleSpell = (spell: DnDSpell) => {
+    const toggleSpell = (spell: DnDSpell) => {
     const isCantrip = spell.level === 0;
     const list = isCantrip ? sc.cantripsKnown : sc.spellsKnown;
     const has = list.includes(spell.name);
+
+    if (!has) {
+      // Adding — enforce limits
+      if (isCantrip && atCantripMax) {
+        alert(
+          `Cantrip limit reached (${cantripCount} / ${cantripLimit}). Remove one first.`
+        );
+        return;
+      }
+      if (!isCantrip && atSpellMax) {
+        alert(
+          `${prepared ? 'Prepared spell' : 'Spell'} limit reached (${spellCount} / ${spellLimit}). Remove one first.`
+        );
+        return;
+      }
+    }
+
     const next = has
       ? list.filter((n) => n !== spell.name)
       : [...list, spell.name];
@@ -129,13 +198,15 @@ export default function SpellsTab({ characterId }: Props) {
           label="Spell Attack"
           value={spellAttack !== undefined ? formatModifier(spellAttack) : '—'}
         />
-        <SummaryBox
-          label="Cantrips"
-          value={String(sc.cantripsKnown.length)}
+        <LimitBar
+          label="Cantrips Known"
+          current={cantripCount}
+          max={cantripLimit}
         />
-        <SummaryBox
-          label="Spells Known"
-          value={String(sc.spellsKnown.length)}
+        <LimitBar
+          label={prepared ? 'Spells Prepared' : 'Spells Known'}
+          current={spellCount}
+          max={spellLimit}
         />
       </div>
 
@@ -235,6 +306,7 @@ export default function SpellsTab({ characterId }: Props) {
               key={sp.name}
               spell={sp}
               known={isKnown(sp)}
+              disabled={sp.level === 0 ? atCantripMax : atSpellMax}
               onToggle={() => toggleSpell(sp)}
             />
           ))}
@@ -339,10 +411,12 @@ function FilterChip({
 function SpellCard({
   spell,
   known,
+  disabled,
   onToggle,
 }: {
   spell: DnDSpell;
   known: boolean;
+  disabled: boolean;
   onToggle: () => void;
 }) {
   const [expanded, setExpanded] = useState(false);
@@ -366,11 +440,19 @@ function SpellCard({
           </div>
           <button
             onClick={onToggle}
-            className={`px-2 py-1 text-xs rounded font-semibold whitespace-nowrap ${
+            disabled={!known && disabled}
+            className={`px-2 py-1 text-xs rounded font-semibold whitespace-nowrap transition ${
               known
                 ? 'bg-ember text-white hover:bg-red-700'
-                : 'bg-jade text-white hover:bg-green-800'
+                : disabled
+                  ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
+                  : 'bg-jade text-white hover:bg-green-800'
             }`}
+            title={
+              !known && disabled
+                ? 'Spell limit reached — remove another first'
+                : undefined
+            }
           >
             {known ? 'Remove' : 'Add'}
           </button>
@@ -407,6 +489,46 @@ function SpellCard({
             )}
           </div>
         )}
+      </div>
+    </div>
+  );
+}
+
+function LimitBar({
+  label,
+  current,
+  max,
+}: {
+  label: string;
+  current: number;
+  max: number;
+}) {
+  const over = current > max;
+  const atMax = current === max;
+  const pct = max > 0 ? Math.min(100, (current / max) * 100) : 0;
+
+  return (
+    <div className="bg-gray-50 rounded p-3">
+      <div className="text-xs uppercase text-gray-500 font-semibold mb-1">
+        {label}
+      </div>
+      <div className="flex items-baseline gap-1 mb-1">
+        <span
+          className={`text-2xl font-bold ${
+            over ? 'text-red-500' : atMax ? 'text-jade' : 'text-ink'
+          }`}
+        >
+          {current}
+        </span>
+        <span className="text-sm text-gray-500">/ {max}</span>
+      </div>
+      <div className="w-full bg-gray-200 rounded-full h-1.5">
+        <div
+          className={`h-1.5 rounded-full transition-all ${
+            over ? 'bg-red-500' : atMax ? 'bg-jade' : 'bg-ember'
+          }`}
+          style={{ width: `${pct}%` }}
+        />
       </div>
     </div>
   );

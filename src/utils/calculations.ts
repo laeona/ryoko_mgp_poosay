@@ -221,6 +221,13 @@ export function getSpellAttackBonus(character: Character): number | undefined {
   return prof + mod;
 }
 
+export function getSpellcastingAbilityMod(character: Character): number {
+  const ability = getSpellcastingAbility(character);
+  if (!ability) return 0;
+  const totals = getTotalAbilityScores(character);
+  return getModifier(totals[ability]);
+}
+
 export function getHitDiceType(character: Character): number {
   // Use the hit die of the class with the most levels (primary class)
   if (character.classes.length === 0) return 8;
@@ -243,3 +250,5 @@ export function rollHitDie(character: Character): {
   const total = Math.max(1, roll + conMod);
   return { roll, conMod, total, dieType };
 }
+
+import { getModifier as _getModifier } from './calculations';

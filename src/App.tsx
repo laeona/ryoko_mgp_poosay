@@ -60,7 +60,9 @@ function App() {
             onEdit={handleEdit}
           />
         )}
-        {view === 'builder' && <CharacterBuilder onDone={handleDone} />}
+        {view === 'builder' && (
+          <CharacterBuilder onDone={handleDone} onCancel={handleBack} />
+        )}
         {view === 'sheet' && editingId && (
           <CharacterSheet characterId={editingId} />
         )}

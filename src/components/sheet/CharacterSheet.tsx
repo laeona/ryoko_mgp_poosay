@@ -2,6 +2,7 @@ import { useCharacterStore } from '../../store/characterStore';
 import RaceTab from './tabs/RaceTab';
 import ClassTab from './tabs/ClassTab';
 import BackgroundTab from './tabs/BackgroundTab';
+import AbilitiesTab from './tabs/AbilitiesTab';
 
 interface Props {
   characterId: string;
@@ -88,10 +89,14 @@ export default function CharacterSheet({ characterId }: Props) {
         {activeTab === 'background' && (
           <BackgroundTab characterId={characterId} />
         )}
+        {activeTab === 'abilities' && (
+          <AbilitiesTab characterId={characterId} />
+        )}
         {activeTab !== 'overview' &&
           activeTab !== 'race' &&
           activeTab !== 'class' &&
-          activeTab !== 'background' && (
+          activeTab !== 'background' &&
+          activeTab !== 'abilities' && (
             <ComingSoon
               tabName={TABS.find((t) => t.id === activeTab)?.label ?? ''}
             />

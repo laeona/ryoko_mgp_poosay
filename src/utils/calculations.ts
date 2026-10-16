@@ -4,6 +4,7 @@ import type {
   Character,
 } from '../types/character';
 import { getRace } from '../data/races';
+import { getClass } from '../data/classes';
 
 export const ABILITY_KEYS: AbilityScoreKey[] = [
   'strength',
@@ -32,6 +33,34 @@ export const ABILITY_FULL_LABELS: Record<AbilityScoreKey, string> = {
   charisma: 'Charisma',
 };
 
+export interface SkillDef {
+  name: string;
+  ability: AbilityScoreKey;
+}
+
+export const SKILLS: SkillDef[] = [
+  { name: 'Acrobatics', ability: 'dexterity' },
+  { name: 'Animal Handling', ability: 'wisdom' },
+  { name: 'Arcana', ability: 'intelligence' },
+  { name: 'Athletics', ability: 'strength' },
+  { name: 'Deception', ability: 'charisma' },
+  { name: 'History', ability: 'intelligence' },
+  { name: 'Insight', ability: 'wisdom' },
+  { name: 'Intimidation', ability: 'charisma' },
+  { name: 'Investigation', ability: 'intelligence' },
+  { name: 'Medicine', ability: 'wisdom' },
+  { name: 'Nature', ability: 'intelligence' },
+  { name: 'Perception', ability: 'wisdom' },
+  { name: 'Performance', ability: 'charisma' },
+  { name: 'Persuasion', ability: 'charisma' },
+  { name: 'Religion', ability: 'intelligence' },
+  { name: 'Sleight of Hand', ability: 'dexterity' },
+  { name: 'Stealth', ability: 'dexterity' },
+  { name: 'Survival', ability: 'wisdom' },
+];
+
+/* ---------- Basic math ---------- */
+
 export function emptyScores(): AbilityScores {
   return {
     strength: 0,
@@ -54,6 +83,8 @@ export function formatModifier(mod: number): string {
 export function getProficiencyBonus(level: number): number {
   return Math.floor((level - 1) / 4) + 2;
 }
+
+/* ---------- Ability scores ---------- */
 
 export function getRacialBonuses(character: Character): AbilityScores {
   const totals = emptyScores();
@@ -85,4 +116,107 @@ export function getTotalAbilityScores(character: Character): AbilityScores {
     totals[key] += bonuses[key];
   }
   return totals;
+}
+
+/* ---------- Proficiencies ---------- */
+
+export function getSavingThrowProficiencies(character: Character): AbilityScoreKey[] {
+  const set = new Set<AbilityScoreKey>();
+  for (const cl of character.classes) {
+    const cls = getClass(cl.className);
+    if (!cls) continue;
+    for (const save of cls.savingThrows) {
+      set.add(save as AbilityScoreKey);
+    }
+  }
+  return [...set];
+}
+
+export function isProficientInSkill(
+  character: Character,
+  skill: string
+): boolean {
+  return (
+    character.background.skills.includes(skill) ||
+    character.skillProficiencies.includes(skill)
+  );
+}
+
+export function hasExpertiseInSkill(
+  character: Character,
+  skill: string
+): boolean {
+  return character.skillExpertise.includes(skill);
+}
+
+/* ---------- Skill / save modifiers ---------- */
+
+export function getSkillBonus(character: Character, skillName: string): number {
+  const skill = SKILLS.find((s) => s.name === skillName);
+  if (!skill) return 0;
+
+  const totals = getTotalAbilityScores(character);
+  const abilityMod = getModifier(totals[skill.ability]);
+  const prof = getProficiencyBonus(character.level);
+
+  let bonus = abilityMod;
+  if (isProficientInSkill(character, skillName)) bonus += prof;
+  if (hasExpertiseInSkill(character, skillName)) bonus += prof;
+  return bonus;
+}
+
+export function getSavingThrowBonus(
+  character: Character,
+  ability: AbilityScoreKey
+): number {
+  const totals = getTotalAbilityScores(character);
+  const abilityMod = getModifier(totals[ability]);
+  const prof = getProficiencyBonus(character.level);
+  const isProficient = getSavingThrowProficiencies(character).includes(ability);
+  return abilityMod + (isProficient ? prof : 0);
+}
+
+export function getPassivePerception(character: Character): number {
+  return 10 + getSkillBonus(character, 'Perception');
+}
+
+export function getInitiative(character: Character): number {
+  const totals = getTotalAbilityScores(character);
+  return getModifier(totals.dexterity);
+}
+
+/* ---------- Spellcasting ---------- */
+
+export function getSpellcastingAbility(
+  character: Character
+): AbilityScoreKey | undefined {
+  for (const cl of character.classes) {
+    const cls = getClass(cl.className);
+    if (!cls?.spellcasting) continue;
+    if (cls.spellcasting.ability === 'choice') {
+      const chosen = cl.choices['spellcasting-ability'] as string | undefined;
+      if (chosen) return chosen.toLowerCase() as AbilityScoreKey;
+    } else {
+      return cls.spellcasting.ability as AbilityScoreKey;
+    }
+  }
+  return undefined;
+}
+
+export function getSpellSaveDC(character: Character): number | undefined {
+  const ability = getSpellcastingAbility(character);
+  if (!ability) return undefined;
+  const totals = getTotalAbilityScores(character);
+  const mod = getModifier(totals[ability]);
+  const prof = getProficiencyBonus(character.level);
+  return 8 + prof + mod;
+}
+
+export function getSpellAttackBonus(character: Character): number | undefined {
+  const ability = getSpellcastingAbility(character);
+  if (!ability) return undefined;
+  const totals = getTotalAbilityScores(character);
+  const mod = getModifier(totals[ability]);
+  const prof = getProficiencyBonus(character.level);
+  return prof + mod;
 }

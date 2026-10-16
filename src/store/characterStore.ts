@@ -94,6 +94,8 @@ export function createBlankCharacter(): Character {
     martialLevel: 0,
     inventory: [],
     prostheses: [],
+    skillProficiencies: [],
+    skillExpertise: [],
     combat: {
       maxHP: 10,
       currentHP: 10,

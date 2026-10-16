@@ -39,8 +39,11 @@ export interface Character {
   combat: CombatData;
   resources: Resource[];
   features: Feature[];
+  skillProficiencies: string[];
+  skillExpertise: string[];
   notes: string;
   backstory: string;
+  activeTab: string;
 }
 
 export interface ClassLevel {
@@ -48,13 +51,6 @@ export interface ClassLevel {
   subclass?: string;
   level: number;
   choices: Record<string, string | string[]>;
-}
-
-export interface Character {
-  // ... all existing fields ...
-  notes: string;
-  backstory: string;
-  activeTab: string;  // <-- ADD THIS LINE
 }
 
 export interface SpellcastingData {

@@ -19,6 +19,7 @@ import {
   hasExpertiseInSkill,
   isProficientInSkill,
 } from '../../../utils/calculations';
+import Rollable from '../../shared/Rollable';
 
 interface Props {
   characterId: string;
@@ -135,8 +136,14 @@ export default function AbilitiesTab({ characterId }: Props) {
                   saveProf ? 'bg-jade text-white' : 'bg-gray-100 text-gray-600'
                 }`}
               >
-                Save {formatModifier(saveBonus)}
-                {saveProf && ' (P)'}
+                <Rollable
+                  d20Modifier={saveBonus}
+                  label={`${ABILITY_FULL_LABELS[key]} Save`}
+                  className="block w-full text-center"
+                >
+                  Save {formatModifier(saveBonus)}
+                  {saveProf && ' (P)'}
+                </Rollable>
               </div>
             </div>
           );
@@ -197,15 +204,21 @@ export default function AbilitiesTab({ characterId }: Props) {
                   {expertise && '★'}
                 </button>
 
-                <span className="text-xs font-bold text-gray-500 w-8">
-                  {formatModifier(bonus)}
-                </span>
-                <span className="flex-1 text-sm">
-                  {skill.name}
-                  {fromBackground && (
-                    <span className="ml-1 text-xs text-jade">(bg)</span>
-                  )}
-                </span>
+                <Rollable
+                  d20Modifier={bonus}
+                  label={`${skill.name} Check`}
+                  className="flex items-center gap-2 flex-1"
+                >
+                  <span className="text-xs font-bold text-gray-500 w-8">
+                    {formatModifier(bonus)}
+                  </span>
+                  <span className="flex-1 text-sm">
+                    {skill.name}
+                    {fromBackground && (
+                      <span className="ml-1 text-xs text-jade">(bg)</span>
+                    )}
+                  </span>
+                </Rollable>
                 <span className="text-xs text-gray-400 uppercase">
                   {ABILITY_LABELS[skill.ability]}
                 </span>

@@ -21,6 +21,7 @@ import {
   getModifier,
   getRacialBonuses,
 } from '../../utils/calculations';
+import DiceRoller from '../shared/DiceRoller';
 
 interface Props {
   characterId: string;
@@ -334,6 +335,8 @@ function OverviewTab({ characterId }: { characterId: string }) {
       <div className="lg:col-span-2">
         <ActionsPanel characterId={characterId} />
       </div>
+      {/* Dice Roller (floating) */}
+      <DiceRoller />
     </div>
   );
 }

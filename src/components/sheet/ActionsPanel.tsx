@@ -8,6 +8,7 @@ import {
   type WeaponAction,
 } from '../../utils/actions';
 import { formatModifier } from '../../utils/calculations';
+import Rollable from '../shared/Rollable';
 
 interface Props {
   characterId: string;
@@ -210,18 +211,36 @@ function ActionSection({
 
 function WeaponRow({ weapon }: { weapon: WeaponAction }) {
   const [expanded, setExpanded] = useState(false);
+
+  // Extract just the dice from the damage string ("1d8 + 3 slashing" → "1d8+3")
+  const damageFormula = weapon.damage.replace(/[^0-9d+\-]/gi, '');
+
   return (
     <div className="border-l-2 border-ember pl-2 py-0.5">
-      <button
-        onClick={() => setExpanded(!expanded)}
-        className="w-full text-left flex items-center gap-2 text-xs hover:bg-gray-50 rounded px-1 py-0.5"
-      >
-        <span className="font-semibold flex-1">{weapon.name}</span>
-        <span className="text-ember font-mono">
+      <div className="w-full flex items-center gap-2 text-xs">
+        <button
+          onClick={() => setExpanded(!expanded)}
+          className="font-semibold flex-1 text-left hover:bg-gray-50 rounded px-1 py-0.5"
+        >
+          {weapon.name}
+        </button>
+        <Rollable
+          d20Modifier={weapon.attackBonus}
+          label={`${weapon.name} Attack`}
+          className="text-ember font-mono px-1 py-0.5 hover:bg-ember/10"
+        >
           {formatModifier(weapon.attackBonus)} to hit
-        </span>
-        <span className="text-gray-700 font-mono">{weapon.damage}</span>
-      </button>
+        </Rollable>
+        {damageFormula && (
+          <Rollable
+            formula={damageFormula}
+            label={`${weapon.name} Damage`}
+            className="text-gray-700 font-mono px-1 py-0.5 hover:bg-ember/10"
+          >
+            {weapon.damage}
+          </Rollable>
+        )}
+      </div>
       {expanded && weapon.properties.length > 0 && (
         <div className="text-xs text-gray-600 pl-2 pt-1 italic">
           {weapon.properties.join(', ')}
@@ -233,30 +252,47 @@ function WeaponRow({ weapon }: { weapon: WeaponAction }) {
 
 function SpellRow({ spell }: { spell: SpellAction }) {
   const [expanded, setExpanded] = useState(false);
+
+  const damageFormula = spell.damage
+  ? spell.damage.replace(/[^0-9d+\-]/gi, '')
+  : undefined;
+
   return (
     <div className="border-l-2 border-purple-500 pl-2 py-0.5">
-      <button
-        onClick={() => setExpanded(!expanded)}
-        className="w-full text-left flex items-center gap-2 text-xs hover:bg-gray-50 rounded px-1 py-0.5"
-      >
-        <span className="font-semibold flex-1 truncate">
+      <div className="w-full flex items-center gap-2 text-xs">
+        <button
+          onClick={() => setExpanded(!expanded)}
+          className="font-semibold flex-1 truncate text-left hover:bg-gray-50 rounded px-1 py-0.5"
+        >
           {spell.name}
           {spell.level > 0 && (
             <span className="text-xs text-gray-500 ml-1">({spell.level})</span>
           )}
-        </span>
+        </button>
         {spell.attackBonus !== undefined && (
-          <span className="text-ember font-mono">
+          <Rollable
+            d20Modifier={spell.attackBonus}
+            label={`${spell.name} Attack`}
+            className="text-ember font-mono px-1 py-0.5 hover:bg-ember/10"
+          >
             {formatModifier(spell.attackBonus)} to hit
-          </span>
+          </Rollable>
         )}
         {spell.saveDC !== undefined && (
-          <span className="text-ember font-mono">DC {spell.saveDC}</span>
+          <span className="text-ember font-mono px-1 py-0.5">
+            DC {spell.saveDC}
+          </span>
         )}
-        {spell.damage && (
-          <span className="text-gray-700 font-mono">{spell.damage}</span>
+        {damageFormula && (
+          <Rollable
+            formula={damageFormula}
+            label={`${spell.name} Damage`}
+            className="text-gray-700 font-mono px-1 py-0.5 hover:bg-ember/10"
+          >
+            {spell.damage}
+          </Rollable>
         )}
-      </button>
+      </div>
       {expanded && (
         <div className="text-xs text-gray-600 pl-2 pt-1">
           <div>

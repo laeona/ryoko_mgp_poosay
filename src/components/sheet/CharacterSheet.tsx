@@ -15,6 +15,12 @@ import RestMenu from './RestMenu';
 import ResourcesPanel from './tabs/ResourcesPanel';
 import HitDicePanel from './HitDicePanel';
 import ActionsPanel from './ActionsPanel';
+import { useEffect } from 'react';
+import { computeMaxHP } from '../../utils/calculations';
+import {
+  getModifier,
+  getRacialBonuses,
+} from '../../utils/calculations';
 
 interface Props {
   characterId: string;
@@ -45,13 +51,29 @@ export default function CharacterSheet({ characterId }: Props) {
 
   const activeTab = character.activeTab || 'overview';
 
-  // Compute total level from class levels
   const totalLevel = character.classes.reduce((s, c) => s + c.level, 0) || 1;
 
   // Keep top-level `level` in sync with sum of class levels
   if (character.level !== totalLevel) {
     updateCharacter(character.id, { level: totalLevel });
   }
+
+  // Auto-recompute max HP whenever class levels change
+  useEffect(() => {
+    const recommended = computeMaxHP(character);
+    if (character.combat.maxHP !== recommended) {
+      const delta = recommended - character.combat.maxHP;
+      updateCharacter(character.id, {
+        combat: {
+          ...character.combat,
+          maxHP: recommended,
+          currentHP: Math.max(1, character.combat.currentHP + delta),
+          hitDiceTotal: totalLevel,
+        },
+      });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [totalLevel, character.classes.map((c) => c.level).join(',')]);
 
   return (
     <div>
@@ -150,13 +172,15 @@ function OverviewTab({ characterId }: { characterId: string }) {
   );
   const updateCharacter = useCharacterStore((s) => s.updateCharacter);
 
+  const racialBonuses = getRacialBonuses(character);
+
   if (!character) return null;
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
       <div className="bg-white rounded-lg shadow p-4">
-        <h3 className="font-bold text-lg mb-3">Base Ability Scores</h3>
-        <div className="grid grid-cols-3 gap-3">
+        <h3 className="font-bold text-lg mb-3">Ability Scores</h3>
+        <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
           {(
             [
               'strength',
@@ -166,31 +190,59 @@ function OverviewTab({ characterId }: { characterId: string }) {
               'wisdom',
               'charisma',
             ] as const
-          ).map((key) => (
-            <div key={key} className="text-center">
-              <label className="block text-xs uppercase font-semibold text-gray-500 mb-1">
-                {key.slice(0, 3)}
-              </label>
-              <input
-                type="number"
-                min={1}
-                max={30}
-                value={character.abilityScores[key]}
-                onChange={(e) =>
-                  updateCharacter(character.id, {
-                    abilityScores: {
-                      ...character.abilityScores,
-                      [key]: parseInt(e.target.value) || 0,
-                    },
-                  })
-                }
-                className="w-full text-center border border-gray-300 rounded px-2 py-1 text-lg font-bold"
-              />
-            </div>
-          ))}
+          ).map((key) => {
+            const base = character.abilityScores[key];
+            const racial = racialBonuses[key];
+            const total = base + racial;
+            const mod = getModifier(total);
+
+            return (
+              <div
+                key={key}
+                className="text-center bg-gray-50 rounded p-2"
+              >
+                <label className="block text-xs uppercase font-semibold text-gray-500 mb-1">
+                  {key.slice(0, 3)}
+                </label>
+
+                {/* Base input */}
+                <input
+                  type="number"
+                  min={1}
+                  max={30}
+                  value={base}
+                  onChange={(e) =>
+                    updateCharacter(character.id, {
+                      abilityScores: {
+                        ...character.abilityScores,
+                        [key]: parseInt(e.target.value) || 0,
+                      },
+                    })
+                  }
+                  className="w-full text-center border border-gray-300 rounded px-2 py-0.5 text-base font-bold mb-1"
+                  title="Base score you assigned (before racial bonus)"
+                />
+
+                {/* Racial / Total / Modifier */}
+                <div className="text-xs leading-tight">
+                  {racial !== 0 && (
+                    <div className="text-jade font-semibold">
+                      {racial > 0 ? `+${racial}` : racial} racial
+                    </div>
+                  )}
+                  <div className="text-gray-700">
+                    Total <span className="font-bold text-ink">{total}</span>
+                  </div>
+                  <div className="text-ember font-bold text-base">
+                    {mod >= 0 ? `+${mod}` : mod}
+                  </div>
+                </div>
+              </div>
+            );
+          })}
         </div>
         <p className="text-xs text-gray-500 mt-2">
-          Enter your base ability scores here. Racial bonuses are applied automatically.
+          Enter base scores above. Racial bonuses from your race/subrace apply automatically.
         </p>
       </div>
 

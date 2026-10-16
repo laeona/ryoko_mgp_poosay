@@ -11,8 +11,6 @@ import {
   ABILITY_FULL_LABELS,
   ABILITY_KEYS,
   ABILITY_LABELS,
-  getModifier,
-  getTotalAbilityScores,
 } from '../../utils/calculations';
 import type { AbilityScoreKey } from '../../types/character';
 
@@ -70,11 +68,18 @@ export default function LevelUpWizard({ characterId, onClose }: Props) {
     const cls = getClass(cl.className);
     if (!cls) return;
 
-    // 1. Compute HP gain
-    const scoreBefore = getTotalAbilityScores(character);
-    const conModBefore = getModifier(scoreBefore.constitution);
+    // Compute HP for the new level
+    const baseHP =
+      hpMode === 'average'
+        ? getAverageHP(summary.hitDie)
+        : rolledValue ?? getAverageHP(summary.hitDie);
+    const hpGain = Math.max(1, baseHP);
 
-    // 2. Apply ASI to ability scores
+    // Append to the HP rolls array (one entry per level, in level order)
+    const existingRolls = character.combat.hpRolledValues ?? [];
+    const newRolls = [...existingRolls, hpGain];
+
+    // Apply ASI to ability scores
     let updatedAbilityScores = { ...character.abilityScores };
     if (summary.asiAvailable && asiMode === 'plus2' && asiAbility1) {
       updatedAbilityScores[asiAbility1] += 2;
@@ -88,61 +93,30 @@ export default function LevelUpWizard({ characterId, onClose }: Props) {
       updatedAbilityScores[asiAbility2] += 1;
     }
 
-    // 3. Compute new CON mod
-    const characterAfterASI = {
-      ...character,
-      abilityScores: updatedAbilityScores,
-    };
-    const scoreAfter = getTotalAbilityScores(characterAfterASI);
-    const conModAfter = getModifier(scoreAfter.constitution);
-    const conModDelta = conModAfter - conModBefore;
-
-    // 4. Compute HP gain
-    const baseHP =
-      hpMode === 'average'
-        ? getAverageHP(summary.hitDie)
-        : rolledValue ?? getAverageHP(summary.hitDie);
-    const hpFromLevel = Math.max(1, baseHP + conModAfter);
-
-    // Retroactive CON bonus for all previous levels
-    const totalLevelBefore = character.level;
-    const retroactiveHP = conModDelta > 0 ? totalLevelBefore * conModDelta : 0;
-
-    const totalHPGain = hpFromLevel + retroactiveHP;
-
-    // 5. Update classes
+    // Update classes
     const updatedClasses = character.classes.map((c, i) =>
       i === summary.classIndex
         ? {
             ...c,
             level: summary.newLevel,
             subclass: subclassChoice ?? c.subclass,
-            choices: {
-              ...c.choices,
-              ...(subclassChoice && cl.className === 'Tamer'
-                ? { paradigm: subclassChoice }
-                : {}),
-            },
           }
         : c
     );
 
-    // 6. Compute total level
     const totalLevelAfter = updatedClasses.reduce((s, c) => s + c.level, 0);
 
-    // 7. Apply
+    // Apply everything. The CharacterSheet effect will auto-recompute HP.
     updateCharacter(character.id, {
       classes: updatedClasses,
       abilityScores: updatedAbilityScores,
       level: totalLevelAfter,
       combat: {
         ...character.combat,
-        maxHP: character.combat.maxHP + totalHPGain,
-        currentHP: character.combat.currentHP + totalHPGain,
+        hpRolledValues: newRolls,
       },
     });
 
-    // 8. Close
     onClose();
   };
 

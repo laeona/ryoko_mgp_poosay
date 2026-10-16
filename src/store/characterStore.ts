@@ -107,6 +107,7 @@ export function createBlankCharacter(): Character {
       initiative: 0,
       speed: 30,
       conditions: [],
+      hpRolledValues: [],
     },
     resources: [],
     features: [],

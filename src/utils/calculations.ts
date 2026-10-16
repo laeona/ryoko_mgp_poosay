@@ -252,3 +252,33 @@ export function rollHitDie(character: Character): {
 }
 
 import { getModifier as _getModifier } from './calculations';
+
+export function computeMaxHP(character: Character): number {
+  const totalLevel =
+    character.classes.reduce((s, c) => s + c.level, 0) || 1;
+  const scores = getTotalAbilityScores(character);
+  const conMod = getModifier(scores.constitution);
+
+  // Get stored HP rolls; if missing (legacy character), fall back to empty
+  const rolls = character.combat.hpRolledValues ?? [];
+
+  // Build a hit-die-per-level list based on class composition
+  const hitDicePerLevel: number[] = [];
+  for (const cl of character.classes) {
+    const cls = getClass(cl.className);
+    const hd = cls?.hitDie ?? 8;
+    for (let i = 0; i < cl.level; i++) hitDicePerLevel.push(hd);
+  }
+  while (hitDicePerLevel.length < totalLevel) hitDicePerLevel.push(8);
+
+  // For each level, use rolled value if stored, else the average
+  let total = 0;
+  for (let i = 0; i < totalLevel; i++) {
+    const hd = hitDicePerLevel[i] ?? 8;
+    const avg = Math.floor(hd / 2) + 1;
+    const val = rolls[i] ?? avg;
+    total += Math.max(1, val) + conMod;
+  }
+
+  return Math.max(1, total);
+}

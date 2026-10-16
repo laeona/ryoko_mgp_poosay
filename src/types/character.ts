@@ -121,6 +121,7 @@ export interface CombatData {
   initiative: number;
   speed: number;
   conditions: string[];
+  hpRolledValues: number[];
 }
 
 export interface Resource {

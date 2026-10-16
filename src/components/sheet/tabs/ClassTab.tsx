@@ -68,18 +68,38 @@ export default function ClassTab({ characterId }: Props) {
       {adding && (
         <div className="bg-white rounded-lg shadow p-4">
           <h3 className="font-bold mb-3">Choose a Class</h3>
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2">
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2">
             {availableToAdd.map((cls) => (
-              <button
-                key={cls.name}
-                onClick={() => addClass(cls.name)}
-                className="text-left p-3 rounded border-2 border-gray-200 hover:border-jade transition"
-              >
-                <div className="font-semibold">{cls.name}</div>
-                <div className="text-xs text-gray-500">
-                  d{cls.hitDie} · {cls.martialTier}
+              <div key={cls.name} className="relative group/pick">
+                <button
+                  onClick={() => addClass(cls.name)}
+                  className="w-full text-left p-3 rounded border-2 border-gray-200 hover:border-jade transition"
+                >
+                  <div className="font-semibold">{cls.name}</div>
+                  <div className="text-xs text-gray-500 underline decoration-dotted underline-offset-2">
+                    d{cls.hitDie} · {cls.martialTier}
+                  </div>
+                </button>
+                <div className="hidden group-hover/pick:block absolute left-0 right-0 top-full mt-2 z-50 p-3 bg-ink text-parchment text-xs rounded-lg shadow-xl pointer-events-none border border-gray-700">
+                  <div className="font-bold text-sm mb-1 text-ember">
+                    Hit Die: d{cls.hitDie}
+                  </div>
+                  <p className="text-parchment/80 mb-3">
+                    Rolled for HP when you level up (or take the average). Also your Hit Dice pool for short-rest healing.
+                  </p>
+                  <div className="font-bold text-sm mb-1 text-ember">
+                    Martial Tier: {cls.martialTier}
+                  </div>
+                  <p className="text-parchment/80">
+                    {cls.martialTier === 'full' &&
+                      'Grants 1 martial level per class level. Fastest path to Advanced Weapon Mastery techniques.'}
+                    {cls.martialTier === 'half' &&
+                      'Grants ½ martial level per class level (rounded down). Slower weapon mastery progression.'}
+                    {cls.martialTier === 'none' &&
+                      'No Advanced Weapon Mastery progression from this class.'}
+                  </p>
                 </div>
-              </button>
+              </div>
             ))}
           </div>
         </div>
@@ -150,9 +170,30 @@ function ClassCard({
             {cls.name}
             {sub && <span className="text-ember"> · {sub.name}</span>}
           </h2>
-          <p className="text-xs text-gray-500">
-            d{cls.hitDie} Hit Die · {cls.martialTier} martial
+            <p className="text-xs text-gray-500 relative group/info">
+            <span className="underline decoration-dotted underline-offset-2 cursor-help">
+              d{cls.hitDie} Hit Die · {cls.martialTier} martial
+            </span>
             {cls.spellcasting && ` · ${cls.spellcasting.type} caster`}
+            <span className="hidden group-hover/info:block absolute left-0 top-full mt-2 z-50 w-72 p-3 bg-ink text-parchment text-xs rounded-lg shadow-xl pointer-events-none border border-gray-700 font-normal">
+              <span className="block font-bold text-sm mb-1 text-ember">
+                Hit Die: d{cls.hitDie}
+              </span>
+              <span className="block text-parchment/80 mb-3">
+                Rolled for HP when you level up (or take the average). Also your Hit Dice pool for short-rest healing.
+              </span>
+              <span className="block font-bold text-sm mb-1 text-ember">
+                Martial Tier: {cls.martialTier}
+              </span>
+              <span className="block text-parchment/80">
+                {cls.martialTier === 'full' &&
+                  'Grants 1 martial level per class level. Fastest path to Advanced Weapon Mastery techniques.'}
+                {cls.martialTier === 'half' &&
+                  'Grants ½ martial level per class level (rounded down). Slower weapon mastery progression.'}
+                {cls.martialTier === 'none' &&
+                  'No Advanced Weapon Mastery progression from this class.'}
+              </span>
+            </span>
           </p>
         </div>
         <div className="flex items-center gap-2">

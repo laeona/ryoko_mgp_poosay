@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import {
   createBlankCharacter,
   useCharacterStore,
@@ -38,15 +38,19 @@ export default function CharacterBuilder({ onDone, onCancel }: Props) {
   const characters = useCharacterStore((s) => s.characters);
   const updateCharacter = useCharacterStore((s) => s.updateCharacter);
 
+  // useRef guards against StrictMode double-invocation
+  const initializedRef = useRef(false);
   const [draftId, setDraftId] = useState<string | null>(null);
   const [step, setStep] = useState(0);
 
   useEffect(() => {
-    if (draftId) return;
+    if (initializedRef.current) return;
+    initializedRef.current = true;
+
     const c = createBlankCharacter();
     addCharacter(c);
     setDraftId(c.id);
-  }, [draftId, addCharacter]);
+  }, [addCharacter]);
 
   const character = draftId
     ? characters.find((c) => c.id === draftId)

@@ -1,4 +1,4 @@
-import type { DnDClass } from '../types/character';
+import type { DnDClass, Subclass } from '../types/character';
 
 export const CLASSES: DnDClass[] = [
   // ============================================================

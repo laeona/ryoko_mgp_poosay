@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react';
 import { useCharacterStore } from '../../../store/characterStore';
-import { SPELLS, getSpell } from '../../../data/spells';
+import { SPELLS } from '../../../data/spells';
 import { computeSpellSlots } from '../../../data/spellSlots';
 import { getClass } from '../../../data/classes';
 import {
@@ -98,13 +98,6 @@ export default function SpellsTab({ characterId }: Props) {
       </div>
     );
   }
-
-  // Helper: ensures character.spellcasting exists before any write.
-  const ensureSC = () => {
-    if (!character.spellcasting) {
-      updateCharacter(character.id, { spellcasting: sc });
-    }
-  };
 
   // Compute slots from classes
   const { slots, pact } = computeSpellSlots(character.classes);

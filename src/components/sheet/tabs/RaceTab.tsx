@@ -3,8 +3,6 @@ import { RACES } from '../../../data/races';
 import {
   ABILITY_KEYS,
   ABILITY_LABELS,
-  formatModifier,
-  getModifier,
   getRacialBonuses,
 } from '../../../utils/calculations';
 import type { AbilityScoreKey } from '../../../types/character';

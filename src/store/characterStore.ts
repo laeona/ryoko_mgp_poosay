@@ -113,5 +113,6 @@ export function createBlankCharacter(): Character {
     features: [],
     notes: '',
     backstory: '',
+    activeTab: 'overview',
   };
 }

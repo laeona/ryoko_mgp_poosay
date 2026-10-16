@@ -10,7 +10,6 @@ import {
 import {
   ABILITY_FULL_LABELS,
   ABILITY_KEYS,
-  ABILITY_LABELS,
 } from '../../utils/calculations';
 import type { AbilityScoreKey } from '../../types/character';
 

@@ -2,7 +2,6 @@ import { useState } from 'react';
 import { useCharacterStore } from '../../../store/characterStore';
 import {
   CREATURE_TYPES,
-  SENSEI_MARTIAL_STRIKE_DIE,
   SENSEI_TECHNIQUES,
   SIZES,
   TAMER_PROGRESSION,

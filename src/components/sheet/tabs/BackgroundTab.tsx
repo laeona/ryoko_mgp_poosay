@@ -1,9 +1,6 @@
 import { useCharacterStore } from '../../../store/characterStore';
 import { BACKGROUNDS } from '../../../data/backgrounds';
-import {
-  ABILITY_LABELS,
-  ABILITY_FULL_LABELS,
-} from '../../../utils/calculations';
+import { ABILITY_FULL_LABELS } from '../../../utils/calculations';
 
 interface Props {
   characterId: string;

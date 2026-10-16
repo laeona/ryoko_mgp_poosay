@@ -1,5 +1,3 @@
-import type { Resource } from '../types/character';
-
 export interface ResourceTemplate {
   name: string;
   rechargeOn: 'short' | 'long' | 'dawn' | 'none';

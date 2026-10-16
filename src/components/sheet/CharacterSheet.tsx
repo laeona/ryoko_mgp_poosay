@@ -60,6 +60,7 @@ export default function CharacterSheet({ characterId }: Props) {
 
   // Auto-recompute max HP whenever class levels change
   useEffect(() => {
+    if (!character) return;
     const recommended = computeMaxHP(character);
     if (character.combat.maxHP !== recommended) {
       const delta = recommended - character.combat.maxHP;
@@ -73,7 +74,7 @@ export default function CharacterSheet({ characterId }: Props) {
       });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [totalLevel, character.classes.map((c) => c.level).join(',')]);
+  }, [totalLevel, character?.classes.map((c) => c.level).join(',')]);
 
   return (
     <div>
@@ -172,9 +173,9 @@ function OverviewTab({ characterId }: { characterId: string }) {
   );
   const updateCharacter = useCharacterStore((s) => s.updateCharacter);
 
-  const racialBonuses = getRacialBonuses(character);
-
   if (!character) return null;
+
+  const racialBonuses = getRacialBonuses(character);
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">

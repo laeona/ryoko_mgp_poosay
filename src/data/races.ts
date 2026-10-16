@@ -569,6 +569,7 @@ export const RACES: Race[] = [
     subraces: [
       {
         name: 'Nishikin',
+        abilityScoreIncrease: {},
         traits: [
           {
             name: 'Moonblessed',
@@ -599,6 +600,7 @@ export const RACES: Race[] = [
       },
       {
         name: 'Ryujin',
+        abilityScoreIncrease: {},
         traits: [
           {
             name: 'Cloudstep',

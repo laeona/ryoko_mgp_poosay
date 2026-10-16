@@ -46,6 +46,13 @@ export interface ClassLevel {
   choices: Record<string, string | string[]>;
 }
 
+export interface Character {
+  // ... all existing fields ...
+  notes: string;
+  backstory: string;
+  activeTab: string;  // <-- ADD THIS LINE
+}
+
 export interface SpellcastingData {
   ability: 'intelligence' | 'wisdom' | 'charisma';
   spellSlots: Record<number, { max: number; used: number }>;
@@ -109,4 +116,108 @@ export interface Feature {
   name: string;
   source: string;
   description: string;
+}
+
+// Race-related types
+
+export interface AbilityScores {
+  strength: number;
+  dexterity: number;
+  constitution: number;
+  intelligence: number;
+  wisdom: number;
+  charisma: number;
+}
+
+export type AbilityScoreKey = keyof AbilityScores;
+
+export interface RacialTrait {
+  name: string;
+  description: string;
+}
+
+export interface RacialChoice {
+  id: string;
+  label: string;
+  type: 'select' | 'multi-select';
+  count?: number;
+  options: string[];
+}
+
+export interface Subrace {
+  name: string;
+  abilityScoreIncrease: Partial<AbilityScores>;
+  size?: string;
+  speed?: number;
+  speedDescription?: string;
+  traits: RacialTrait[];
+  choices?: RacialChoice[];
+}
+
+export interface Race {
+  name: string;
+  description: string;
+  abilityScoreIncrease: Partial<AbilityScores>;
+  age: string;
+  anatomy: string;
+  size: string;
+  speed: number;
+  speedDescription?: string;
+  creatureType: string;
+  languages: string;
+  traits: RacialTrait[];
+  choices?: RacialChoice[];
+  subraces?: Subrace[];
+  /** Some races (e.g., Tatsumi) have a subrace-level choice like "Koi Dragon Colour" */
+  preSubraceChoice?: RacialChoice;
+}
+
+// Class-related types
+
+export interface ClassFeature {
+  level: number;
+  name: string;
+  description: string;
+}
+
+export interface Subclass {
+  name: string;
+  description: string;
+  features: ClassFeature[];
+}
+
+export interface ClassSpellcasting {
+  type: 'full' | 'half' | 'third' | 'pact' | 'none';
+  ability: 'intelligence' | 'wisdom' | 'charisma' | 'choice';
+  ritual?: boolean;
+  focus?: string;
+}
+
+export interface ClassChoice {
+  id: string;
+  label: string;
+  type: 'select' | 'multi-select';
+  count?: number;
+  options: string[];
+  /** Level at which this choice is made */
+  level: number;
+}
+
+export interface DnDClass {
+  name: string;
+  description: string;
+  hitDie: number;
+  primaryAbility: string[];
+  savingThrows: string[];
+  armorProficiencies: string[];
+  weaponProficiencies: string[];
+  toolProficiencies: string[];
+  skillChoices: { count: number; options: string[] };
+  subclassLevel: number;
+  subclassLabel?: string;
+  features: ClassFeature[];
+  subclasses: Subclass[];
+  choices?: ClassChoice[];
+  spellcasting?: ClassSpellcasting;
+  martialTier: 'full' | 'half' | 'none';
 }

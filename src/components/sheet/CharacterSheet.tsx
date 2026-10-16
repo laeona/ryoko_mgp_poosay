@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { useCharacterStore } from '../../store/characterStore';
 import RaceTab from './tabs/RaceTab';
 import ClassTab from './tabs/ClassTab';
@@ -9,6 +10,7 @@ import SpellsTab from './tabs/SpellsTab';
 import InventoryTab from './tabs/InventoryTab';
 import AdvancedWeaponMasteryTab from './tabs/AdvancedWeaponMasteryTab';
 import TamerTab from './tabs/TamerTab';
+import LevelUpWizard from './LevelUpWizard';
 
 interface Props {
   characterId: string;
@@ -20,9 +22,9 @@ const TABS = [
   { id: 'class', label: 'Class' },
   { id: 'background', label: 'Background' },
   { id: 'abilities', label: 'Abilities' },
-  { id: 'spells', label: 'Spells' },
   { id: 'features', label: 'Features' },
   { id: 'feats', label: 'Feats' },
+  { id: 'spells', label: 'Spells' },
   { id: 'weapon-mastery', label: 'Weapon Mastery' },
   { id: 'tamer', label: 'Tamer' },
   { id: 'inventory', label: 'Inventory' },
@@ -33,6 +35,7 @@ export default function CharacterSheet({ characterId }: Props) {
     s.characters.find((c) => c.id === characterId)
   );
   const updateCharacter = useCharacterStore((s) => s.updateCharacter);
+  const [showLevelUp, setShowLevelUp] = useState(false);
 
   if (!character) return <p>Character not found.</p>;
 
@@ -57,7 +60,7 @@ export default function CharacterSheet({ characterId }: Props) {
           }
           className="text-3xl font-bold mb-2 border-b border-transparent hover:border-gray-300 focus:border-ember outline-none w-full"
         />
-        <div className="flex items-center gap-3 text-sm text-gray-600">
+        <div className="flex items-center gap-3 text-sm text-gray-600 flex-wrap">
           <span className="px-2 py-0.5 bg-ink text-parchment rounded">
             Level {totalLevel}
           </span>
@@ -68,6 +71,14 @@ export default function CharacterSheet({ characterId }: Props) {
               ? character.classes.map((c) => c.className).join(' / ')
               : 'No class'}
           </span>
+          {character.classes.length > 0 && totalLevel < 20 && (
+            <button
+              onClick={() => setShowLevelUp(true)}
+              className="ml-auto px-3 py-1 text-xs bg-jade text-white rounded hover:bg-green-800 transition font-semibold"
+            >
+              ⬆️ Level Up
+            </button>
+          )}
         </div>
       </div>
 
@@ -101,24 +112,7 @@ export default function CharacterSheet({ characterId }: Props) {
         {activeTab === 'abilities' && (
           <AbilitiesTab characterId={characterId} />
         )}
-        {activeTab !== 'overview' &&
-          activeTab !== 'race' &&
-          activeTab !== 'class' &&
-          activeTab !== 'background' &&
-          activeTab !== 'abilities' &&
-          activeTab !== 'features' &&
-          activeTab !== 'feats' &&
-          activeTab !== 'spells' &&
-          activeTab !== 'weapon-mastery' &&
-          activeTab !== 'tamer' &&
-          activeTab !== 'inventory' && (
-            <ComingSoon
-              tabName={TABS.find((t) => t.id === activeTab)?.label ?? ''}
-            />
-          )}
-        {activeTab === 'features' && (
-          <FeaturesTab characterId={characterId} />
-        )}
+        {activeTab === 'features' && <FeaturesTab characterId={characterId} />}
         {activeTab === 'feats' && <FeatsTab characterId={characterId} />}
         {activeTab === 'spells' && <SpellsTab characterId={characterId} />}
         {activeTab === 'weapon-mastery' && (
@@ -129,6 +123,14 @@ export default function CharacterSheet({ characterId }: Props) {
           <InventoryTab characterId={characterId} />
         )}
       </div>
+
+      {/* Level Up Wizard Modal */}
+      {showLevelUp && (
+        <LevelUpWizard
+          characterId={characterId}
+          onClose={() => setShowLevelUp(false)}
+        />
+      )}
     </div>
   );
 }
@@ -148,30 +150,37 @@ function OverviewTab({ characterId }: { characterId: string }) {
       <div className="bg-white rounded-lg shadow p-4">
         <h3 className="font-bold text-lg mb-3">Base Ability Scores</h3>
         <div className="grid grid-cols-3 gap-3">
-          {(['strength', 'dexterity', 'constitution', 'intelligence', 'wisdom', 'charisma'] as const).map(
-            (key) => (
-              <div key={key} className="text-center">
-                <label className="block text-xs uppercase font-semibold text-gray-500 mb-1">
-                  {key.slice(0, 3)}
-                </label>
-                <input
-                  type="number"
-                  min={1}
-                  max={30}
-                  value={character.abilityScores[key]}
-                  onChange={(e) =>
-                    updateCharacter(character.id, {
-                      abilityScores: {
-                        ...character.abilityScores,
-                        [key]: parseInt(e.target.value) || 0,
-                      },
-                    })
-                  }
-                  className="w-full text-center border border-gray-300 rounded px-2 py-1 text-lg font-bold"
-                />
-              </div>
-            )
-          )}
+          {(
+            [
+              'strength',
+              'dexterity',
+              'constitution',
+              'intelligence',
+              'wisdom',
+              'charisma',
+            ] as const
+          ).map((key) => (
+            <div key={key} className="text-center">
+              <label className="block text-xs uppercase font-semibold text-gray-500 mb-1">
+                {key.slice(0, 3)}
+              </label>
+              <input
+                type="number"
+                min={1}
+                max={30}
+                value={character.abilityScores[key]}
+                onChange={(e) =>
+                  updateCharacter(character.id, {
+                    abilityScores: {
+                      ...character.abilityScores,
+                      [key]: parseInt(e.target.value) || 0,
+                    },
+                  })
+                }
+                className="w-full text-center border border-gray-300 rounded px-2 py-1 text-lg font-bold"
+              />
+            </div>
+          ))}
         </div>
         <p className="text-xs text-gray-500 mt-2">
           Enter your base ability scores here. Racial bonuses are applied automatically.
@@ -255,18 +264,6 @@ function OverviewTab({ characterId }: { characterId: string }) {
           </div>
         </div>
       </div>
-    </div>
-  );
-}
-
-/* ---------- Placeholder ---------- */
-
-function ComingSoon({ tabName }: { tabName: string }) {
-  return (
-    <div className="bg-white rounded-lg shadow p-12 text-center">
-      <p className="text-gray-500">
-        <span className="font-semibold">{tabName}</span> tab coming soon.
-      </p>
     </div>
   );
 }

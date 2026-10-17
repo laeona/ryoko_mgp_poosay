@@ -18,9 +18,12 @@ import ActionsPanel from './ActionsPanel';
 import { useEffect } from 'react';
 import { computeMaxHP } from '../../utils/calculations';
 import {
+  getInitiative,
   getModifier,
   getRacialBonuses,
 } from '../../utils/calculations';
+import { formatModifier } from '../../utils/dice';
+import Rollable from '../shared/Rollable';
 
 interface Props {
   characterId: string;
@@ -177,6 +180,8 @@ function OverviewTab({ characterId }: { characterId: string }) {
 
   const racialBonuses = getRacialBonuses(character);
 
+  const initiative = getInitiative(character);
+
   return (
     <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
       <div className="bg-white rounded-lg shadow p-4">
@@ -321,6 +326,42 @@ function OverviewTab({ characterId }: { characterId: string }) {
               }
               className="w-full border border-gray-300 rounded px-2 py-1"
             />
+          </div>
+            <div className="col-span-2">
+            <label className="block text-xs uppercase font-semibold text-gray-500">
+              Initiative
+            </label>
+            <div className="flex items-center gap-2">
+              <Rollable
+                d20Modifier={initiative}
+                label="Initiative"
+                title="Roll initiative (1d20 + Dex modifier)"
+                className="flex-1 flex items-center justify-between border border-gray-300 rounded px-3 py-1 bg-gray-50"
+              >
+                <span className="text-lg font-bold text-ember">
+                  {formatModifier(initiative)}
+                </span>
+                <span className="text-sm text-gray-600">🎲 Roll</span>
+              </Rollable>
+              <Rollable
+                d20Modifier={initiative}
+                mode="advantage"
+                label="Initiative"
+                title="Roll initiative with advantage"
+                className="border border-gray-300 rounded px-2 py-1 text-xs font-semibold text-jade"
+              >
+                Adv
+              </Rollable>
+              <Rollable
+                d20Modifier={initiative}
+                mode="disadvantage"
+                label="Initiative"
+                title="Roll initiative with disadvantage"
+                className="border border-gray-300 rounded px-2 py-1 text-xs font-semibold text-red-600"
+              >
+                Dis
+              </Rollable>
+            </div>
           </div>
         </div>
       </div>

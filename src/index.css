@@ -182,7 +182,7 @@ button.bg-ink:active {
 .lanterns {
   position: absolute;
   top: -1rem; /* hang from the top edge of the header (it has 1rem padding) */
-  right: 17rem;
+  right: 23rem;
   display: none;
   gap: 1.25rem;
   align-items: flex-start;

@@ -3,9 +3,10 @@ import { useCharacterStore } from './store/characterStore';
 import CharacterList from './components/CharacterList';
 import CharacterBuilder from './components/builder/CharacterBuilder';
 import CharacterSheet from './components/sheet/CharacterSheet';
+import SettingPage from './components/SettingPage';
 import DiceRoller from './components/shared/DiceRoller';
 
-type View = 'list' | 'builder' | 'sheet';
+type View = 'list' | 'builder' | 'sheet' | 'setting';
 type Theme = 'day' | 'night';
 
 function getInitialTheme(): Theme {
@@ -134,6 +135,18 @@ function App() {
                 {theme === 'night' ? 'Night' : 'Day'}
               </span>
             </button>
+            <button
+              type="button"
+              onClick={() => {
+                setEditingId(null);
+                setView('setting');
+              }}
+              className="theme-toggle"
+              aria-current={view === 'setting' ? 'page' : undefined}
+            >
+              <span className="font-display" aria-hidden="true">界</span>
+              <span className="text-sm font-semibold">World</span>
+            </button>
             {view !== 'list' && (
               <button
                 onClick={handleBack}
@@ -157,6 +170,7 @@ function App() {
         {view === 'builder' && (
           <CharacterBuilder onDone={handleDone} onCancel={handleBack} />
         )}
+        {view === 'setting' && <SettingPage />}
         {view === 'sheet' && editingId && (
           <CharacterSheet characterId={editingId} />
         )}

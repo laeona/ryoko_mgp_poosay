@@ -48,7 +48,18 @@ export interface Character {
   skillExpertise: string[];
   notes: string;
   backstory: string;
+  /** Character picture, stored as a small JPEG data URL so it travels with exports. */
+  portrait?: string;
+  /** Free-form notes the player adds on the Notes tab. */
+  noteEntries?: NoteEntry[];
   activeTab: string;
+}
+
+export interface NoteEntry {
+  id: string;
+  title: string;
+  body: string;
+  updatedAt: string;
 }
 
 export interface ClassLevel {

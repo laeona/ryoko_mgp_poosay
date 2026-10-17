@@ -56,12 +56,27 @@ export default function CharacterList({ characters, onCreate, onEdit }: Props) {
               key={c.id}
               className="border border-gray-300 rounded-lg p-4 bg-white shadow hover:shadow-lg transition"
             >
-              <h3 className="text-xl font-bold mb-1">{c.name}</h3>
-              <p className="text-sm text-gray-600 mb-3">
-                Level {c.level}{' '}
-                {c.classes.map((cl) => cl.className).join(' / ') || 'No class'}{' '}
-                · {c.race.name || 'No race'}
-              </p>
+              <div className="flex items-center gap-3 mb-3">
+                {c.portrait ? (
+                  <img
+                    src={c.portrait}
+                    alt={`${c.name} portrait`}
+                    className="w-14 h-14 rounded-full object-cover border-2 border-gray-300 shrink-0"
+                  />
+                ) : (
+                  <div className="w-14 h-14 rounded-full bg-ink text-parchment flex items-center justify-center text-xl font-bold shrink-0">
+                    {(c.name.trim().charAt(0) || '?').toUpperCase()}
+                  </div>
+                )}
+                <div className="min-w-0">
+                  <h3 className="text-xl font-bold mb-1 truncate">{c.name}</h3>
+                  <p className="text-sm text-gray-600">
+                    Level {c.level}{' '}
+                    {c.classes.map((cl) => cl.className).join(' / ') || 'No class'}{' '}
+                    · {c.race.name || 'No race'}
+                  </p>
+                </div>
+              </div>
               <div className="flex gap-2 flex-wrap">
                 <button
                   onClick={() => onEdit(c.id)}

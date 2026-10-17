@@ -8,6 +8,8 @@ import FeaturesTab from './tabs/FeaturesTab';
 import FeatsTab from './tabs/FeatsTab';
 import SpellsTab from './tabs/SpellsTab';
 import InventoryTab from './tabs/InventoryTab';
+import NotesTab from './tabs/NotesTab';
+import PortraitPicker from './PortraitPicker';
 import AdvancedWeaponMasteryTab from './tabs/AdvancedWeaponMasteryTab';
 import TamerTab from './tabs/TamerTab';
 import FeatSpellsPanel from './tabs/FeatSpellsPanel';
@@ -46,6 +48,7 @@ const TABS = [
   { id: 'weapon-mastery', label: 'Weapon Mastery' },
   { id: 'tamer', label: 'Tamer' },
   { id: 'inventory', label: 'Inventory' },
+  { id: 'notes', label: 'Notes' },
 ] as const;
 
 export default function CharacterSheet({ characterId }: Props) {
@@ -108,7 +111,9 @@ export default function CharacterSheet({ characterId }: Props) {
   return (
     <div>
       {/* Header */}
-      <div className="bg-white rounded-lg shadow p-4 mb-4">
+      <div className="bg-white rounded-lg shadow p-4 mb-4 flex items-start gap-4">
+        <PortraitPicker characterId={characterId} />
+        <div className="flex-1 min-w-0">
         <input
           value={character.name}
           onChange={(e) =>
@@ -138,6 +143,7 @@ export default function CharacterSheet({ characterId }: Props) {
               </button>
             )}
           </div>
+        </div>
         </div>
       </div>
 
@@ -186,6 +192,7 @@ export default function CharacterSheet({ characterId }: Props) {
         {activeTab === 'inventory' && (
           <InventoryTab characterId={characterId} />
         )}
+        {activeTab === 'notes' && <NotesTab characterId={characterId} />}
       </div>
 
       {/* Level Up Wizard Modal */}

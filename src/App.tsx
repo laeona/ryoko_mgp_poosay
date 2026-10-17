@@ -3,6 +3,7 @@ import { useCharacterStore } from './store/characterStore';
 import CharacterList from './components/CharacterList';
 import CharacterBuilder from './components/builder/CharacterBuilder';
 import CharacterSheet from './components/sheet/CharacterSheet';
+import DiceRoller from './components/shared/DiceRoller';
 
 type View = 'list' | 'builder' | 'sheet';
 
@@ -67,6 +68,7 @@ function App() {
           <CharacterSheet characterId={editingId} />
         )}
       </main>
+      <DiceRoller />
     </div>
   );
 }

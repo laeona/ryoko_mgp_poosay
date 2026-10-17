@@ -157,7 +157,7 @@ export default function CharacterSheet({ characterId }: Props) {
             }
             className={`px-4 py-2 text-sm font-semibold rounded-t transition ${
               activeTab === tab.id
-                ? 'bg-white text-ember border border-b-0 border-gray-300'
+                ? 'tab-brush bg-white text-ember border border-b-0 border-gray-300'
                 : 'text-gray-600 hover:text-ink'
             }`}
           >

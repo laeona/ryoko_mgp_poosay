@@ -24,15 +24,21 @@ export default function DiceRoller() {
       {/* Floating button */}
       <button
         onClick={() => setPanelOpen(!panelOpen)}
-        className="fixed bottom-6 right-6 w-14 h-14 rounded-full bg-ember text-white shadow-2xl hover:bg-red-700 transition z-40 flex items-center justify-center text-2xl"
+        className="dice-fab fixed bottom-6 right-6 w-14 h-14 text-white transition z-40 flex items-center justify-center"
         title="Dice Roller"
+        aria-label="Dice Roller"
       >
-        🎲
+        <svg viewBox="0 0 32 32" className="w-9 h-9" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinejoin="round" strokeLinecap="round" aria-hidden="true">
+          <polygon points="16,2 28,9 28,23 16,30 4,23 4,9" />
+          <polygon points="16,8 23,21 9,21" />
+          <path d="M16 8V2M16 8L4 9M16 8L28 9M23 21L28 23M23 21L28 9M9 21L4 23M9 21L4 9M23 21H9M9 21L16 30M23 21L16 30" strokeWidth="1.1" />
+          <text x="16" y="19" textAnchor="middle" fontSize="7" fontWeight="700" fill="currentColor" stroke="none">20</text>
+        </svg>
       </button>
 
       {/* Last roll toast */}
       {lastRoll && !panelOpen && (
-        <div className="fixed bottom-24 right-6 bg-ink text-parchment px-4 py-2 rounded-lg shadow-xl z-40 max-w-xs animate-fade-in">
+        <div className="fixed bottom-24 right-6 bg-kon text-parchment px-4 py-2 rounded-lg shadow-xl z-40 max-w-xs animate-fade-in border border-gold/60">
           <div className="text-xs text-parchment/60">
             {lastRoll.label ? `${lastRoll.label} · ` : ''}
             {lastRoll.formula}
@@ -51,10 +57,10 @@ export default function DiceRoller() {
 
       {/* Panel */}
       {panelOpen && (
-        <div className="fixed bottom-6 right-24 w-80 max-h-[70vh] bg-parchment border border-gray-300 rounded-lg shadow-2xl flex flex-col z-40">
+        <div className="fixed bottom-6 right-24 w-80 max-h-[70vh] bg-washi border border-gold/50 rounded-lg shadow-2xl flex flex-col z-40">
           {/* Header */}
-          <div className="bg-ink text-parchment p-3 flex items-center justify-between rounded-t-lg">
-            <h3 className="font-bold">🎲 Dice Roller</h3>
+          <div className="site-header text-parchment p-3 flex items-center justify-between rounded-t-lg">
+            <h3 className="font-bold tracking-wide">Dice Roller</h3>
             <button
               onClick={() => setPanelOpen(false)}
               className="text-parchment hover:text-ember text-xl leading-none"

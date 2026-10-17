@@ -23,6 +23,15 @@ export default function CharacterList({ characters, onCreate, onEdit }: Props) {
 
   return (
     <div>
+      <div className="mb-6">
+        <h2 className="text-3xl font-bold tracking-wide">
+          Your Characters{' '}
+          <span className="text-base font-normal tracking-[0.3em] text-shu">
+            冒険者
+          </span>
+        </h2>
+        <hr className="brush-rule mt-2" />
+      </div>
       <div className="flex gap-3 mb-6">
         <button
           onClick={onCreate}
@@ -46,25 +55,28 @@ export default function CharacterList({ characters, onCreate, onEdit }: Props) {
       </div>
 
       {characters.length === 0 ? (
-        <p className="text-gray-600">
-          No characters yet. Create your first one!
-        </p>
+        <div className="text-center py-12 text-gray-600">
+          <span className="hanko mb-3" aria-hidden="true">
+            妖
+          </span>
+          <p>No characters yet. Create your first one!</p>
+        </div>
       ) : (
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
           {characters.map((c) => (
             <div
               key={c.id}
-              className="border border-gray-300 rounded-lg p-4 bg-white shadow hover:shadow-lg transition"
+              className="char-card border border-gray-300 rounded-lg p-4 bg-white shadow hover:shadow-lg transition"
             >
               <div className="flex items-center gap-3 mb-3">
                 {c.portrait ? (
                   <img
                     src={c.portrait}
                     alt={`${c.name} portrait`}
-                    className="w-14 h-14 rounded-full object-cover border-2 border-gray-300 shrink-0"
+                    className="w-14 h-14 rounded-full object-cover border-2 border-gold shrink-0"
                   />
                 ) : (
-                  <div className="w-14 h-14 rounded-full bg-ink text-parchment flex items-center justify-center text-xl font-bold shrink-0">
+                  <div className="w-14 h-14 rounded-full bg-kon text-parchment border-2 border-gold flex items-center justify-center text-xl font-bold font-display shrink-0">
                     {(c.name.trim().charAt(0) || '?').toUpperCase()}
                   </div>
                 )}

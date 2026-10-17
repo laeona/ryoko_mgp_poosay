@@ -2,6 +2,12 @@ import { useState } from 'react';
 import { useCharacterStore } from '../../../store/characterStore';
 import { FEATS } from '../../../data/feats';
 import type { DnDFeat } from '../../../types/character';
+import {
+  ABILITY_KEYS,
+  SKILLS,
+  getFeatAbilityChoice,
+} from '../../../utils/calculations';
+import { COMMON_RESOURCES, getResourceMax } from '../../../data/restResources';
 
 interface Props {
   characterId: string;
@@ -30,8 +36,41 @@ export default function FeatsTab({ characterId }: Props) {
 
   const toggleFeat = (name: string) => {
     const has = owned.includes(name);
+    // Feats with limited uses also add (or remove) their tracker in Resources
+    const templates = COMMON_RESOURCES.filter((t) => t.feats?.includes(name));
+    const resources = character.resources ?? [];
+    let nextResources = resources;
+    if (has) {
+      const stillOwned = owned.filter((f) => f !== name);
+      const names = new Set(
+        templates
+          .filter((t) => !t.feats?.some((f) => stillOwned.includes(f)))
+          .map((t) => t.name)
+      );
+      nextResources = resources.filter((r) => !names.has(r.name));
+    } else {
+      nextResources = [
+        ...resources,
+        ...templates
+          .filter((t) => !resources.some((r) => r.name === t.name))
+          .map((t) => ({
+            id: crypto.randomUUID(),
+            name: t.name,
+            max: getResourceMax(t, character.level),
+            used: 0,
+            rechargeOn: t.rechargeOn,
+          })),
+      ];
+    }
     updateCharacter(character.id, {
       feats: has ? owned.filter((f) => f !== name) : [...owned, name],
+      resources: nextResources,
+    });
+  };
+
+  const setChoice = (featName: string, value: string) => {
+    updateCharacter(character.id, {
+      featChoices: { ...(character.featChoices ?? {}), [featName]: value },
     });
   };
 
@@ -105,6 +144,12 @@ export default function FeatsTab({ characterId }: Props) {
               feat={feat}
               owned={owned.includes(feat.name)}
               qualifies={qualifies(feat)}
+              choice={getFeatAbilityChoice(character, feat.name)}
+              onChoice={(v) => setChoice(feat.name, v)}
+              skills={(character.featChoices?.[feat.name] ?? '').split(',')}
+              saveChoice={character.featChoices?.[`${feat.name}:save`]}
+              onSkills={(v) => setChoice(feat.name, v.join(','))}
+              onSaveChoice={(v) => setChoice(`${feat.name}:save`, v)}
               onToggle={() => toggleFeat(feat.name)}
             />
           ))}
@@ -144,15 +189,34 @@ function FilterChip({
   );
 }
 
+const SEASONS: Record<string, string> = {
+  dexterity: 'Spring',
+  charisma: 'Summer',
+  wisdom: 'Autumn',
+  constitution: 'Winter',
+};
+
 function FeatCard({
   feat,
   owned,
   qualifies,
+  choice,
+  onChoice,
+  skills,
+  saveChoice,
+  onSkills,
+  onSaveChoice,
   onToggle,
 }: {
   feat: DnDFeat;
   owned: boolean;
   qualifies: boolean;
+  choice?: string;
+  onChoice: (value: string) => void;
+  skills: string[];
+  saveChoice?: string;
+  onSkills: (value: string[]) => void;
+  onSaveChoice: (value: string) => void;
   onToggle: () => void;
 }) {
   return (
@@ -200,6 +264,80 @@ function FeatCard({
         </button>
       </div>
       <p className="text-sm text-gray-700">{feat.description}</p>
+      {owned && feat.abilityIncrease && feat.abilityIncrease.length > 1 && (
+        <label className="block mt-2 text-xs text-gray-600">
+          Ability increase (+1):{' '}
+          <select
+            value={choice ?? ''}
+            onChange={(e) => onChoice(e.target.value)}
+            className="ml-1 px-2 py-1 border border-gray-300 rounded bg-white text-sm"
+          >
+            <option value="">Choose...</option>
+            {feat.abilityIncrease.map((a) => (
+              <option key={a} value={a}>
+                {feat.name === 'Seasonal Determinism'
+                  ? `${SEASONS[a] ?? ''} (${a.slice(0, 3).toUpperCase()})`
+                  : a.charAt(0).toUpperCase() + a.slice(1)}
+              </option>
+            ))}
+          </select>
+          {feat.name === 'Resilient' && (
+            <span className="ml-2 italic">also grants that saving throw proficiency</span>
+          )}
+        </label>
+      )}
+      {owned && feat.skillChoices && (
+        <div className="mt-2 text-xs text-gray-600 space-y-1">
+          <div className="font-semibold">
+            {feat.skillExpertise ? 'Skill (double proficiency)' : 'Skill proficiencies'}:
+          </div>
+          {Array.from({ length: feat.skillChoices.count }).map((_, i) => {
+            const taken = skills.filter((n, j) => j !== i && Boolean(n));
+            const options = (feat.skillChoices?.options ?? SKILLS.map((s) => s.name)).filter(
+              (n) => !taken.includes(n)
+            );
+            return (
+              <select
+                key={i}
+                value={skills[i] ?? ''}
+                onChange={(e) => {
+                  const next = [...skills];
+                  next[i] = e.target.value;
+                  onSkills(next);
+                }}
+                className="block px-2 py-1 border border-gray-300 rounded bg-white text-sm"
+              >
+                <option value="">Choose a skill...</option>
+                {options.map((n) => (
+                  <option key={n} value={n}>
+                    {n}
+                  </option>
+                ))}
+              </select>
+            );
+          })}
+          {feat.skillExpertise && (
+            <div className="italic">Applies once you are proficient in the skill.</div>
+          )}
+        </div>
+      )}
+      {owned && feat.savingThrowChoice && (
+        <label className="block mt-2 text-xs text-gray-600">
+          Saving throw proficiency:{' '}
+          <select
+            value={saveChoice ?? ''}
+            onChange={(e) => onSaveChoice(e.target.value)}
+            className="ml-1 px-2 py-1 border border-gray-300 rounded bg-white text-sm"
+          >
+            <option value="">None / not this time</option>
+            {ABILITY_KEYS.map((a) => (
+              <option key={a} value={a}>
+                {a.charAt(0).toUpperCase() + a.slice(1)}
+              </option>
+            ))}
+          </select>
+        </label>
+      )}
       {!qualifies && feat.racialRequirement && (
         <p className="text-xs text-red-500 mt-2 italic">
           Requires: {feat.racialRequirement.race}

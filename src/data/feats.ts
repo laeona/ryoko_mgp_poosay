@@ -7,12 +7,14 @@ export const FEATS: DnDFeat[] = [
   {
     name: 'Boon of Ashura',
     type: 'general',
+    abilityIncrease: ['strength', 'constitution'],
     description:
       'You have come to possess a fragment of the power of Ashura, the mighty three-headed demon god of passion and fury. Increase your Strength or Constitution score by 1, to a maximum of 20. You can take one additional reaction in a round, but only one reaction on a turn. Uses equal to your proficiency bonus, recharging on a long rest.',
   },
   {
     name: 'Boon of the Jorōgumo',
     type: 'general',
+    skillChoices: { count: 1, options: ['Deception', 'Persuasion'] },
     description:
       "You possess a fragment of the jorōgumo's shapeshifting power. You gain proficiency in Deception or Persuasion. You can cast disguise self a number of times equal to your proficiency bonus per long rest. You have a climbing speed equal to your walking speed and can move up, down, across vertical surfaces and upside down along ceilings, hands free. You ignore difficult terrain caused by webbing.",
   },
@@ -31,6 +33,7 @@ export const FEATS: DnDFeat[] = [
   {
     name: 'Boon of the Ōmukade',
     type: 'general',
+    abilityIncrease: ['constitution'],
     description:
       "Increase your Constitution score by 1, to a maximum of 20. Choose one damage type from acid, cold, fire, lightning, poison, or thunder. You gain resistance to that type and, when you take damage of that type, you can use a reaction to become empowered: your next damage roll within 1 minute deals an extra 1d8 of that type (2d8 at 5th, 3d8 at 11th, 4d8 at 17th). Uses equal to proficiency bonus per long rest.",
   },
@@ -43,6 +46,7 @@ export const FEATS: DnDFeat[] = [
   {
     name: 'Cantrip Combatant',
     type: 'general',
+    abilityIncrease: ['strength', 'dexterity', 'constitution', 'intelligence', 'wisdom', 'charisma'],
     prerequisite:
       'A class feature that allows you to attack more than once when you take the Attack action, and the ability to cast at least one cantrip',
     description:
@@ -51,6 +55,7 @@ export const FEATS: DnDFeat[] = [
   {
     name: 'Combo Striker',
     type: 'general',
+    abilityIncrease: ['strength', 'dexterity', 'constitution', 'intelligence', 'wisdom', 'charisma'],
     description:
       'Increase one ability score of your choice by 1, to a maximum of 20. You can collaborate in a combo attack even if you have already collaborated in one since your last long rest (once per long rest). When you initiate a combo attack, one willing creature of your choice can collaborate without using up their combo for the rest (once per long rest).',
   },
@@ -63,6 +68,7 @@ export const FEATS: DnDFeat[] = [
   {
     name: 'Double Throw',
     type: 'general',
+    abilityIncrease: ['strength', 'dexterity'],
     description:
       'Increase your Strength or Dexterity score by 1, to a maximum of 20. Once per turn, when you make a ranged attack with a weapon that has both the Light and Thrown properties, and you don\'t have disadvantage, you can throw two weapons with a single flick. Make a separate attack roll with disadvantage for each weapon. If you had advantage on the original attack, you don\'t suffer disadvantage. Each attack can target different creatures.',
   },
@@ -81,6 +87,7 @@ export const FEATS: DnDFeat[] = [
   {
     name: 'Extra Attack Tactician',
     type: 'general',
+    abilityIncrease: ['strength', 'dexterity'],
     prerequisite: 'Improved Extra Attack feature',
     description:
       'Increase your Strength or Dexterity score by 1, to a maximum of 20. Choose one class from barbarian, bender, fighter, monk, paladin, or ranger. You can use the 7th-level benefit of the Improved Extra Attack feature from that class a number of times equal to your proficiency bonus, recharging on a long rest. Only one Improved Extra Attack feature per turn. Can be taken multiple times.',
@@ -95,6 +102,7 @@ export const FEATS: DnDFeat[] = [
   {
     name: 'Focused Discipline',
     type: 'general',
+    skillChoices: { count: 1 }, skillExpertise: true,
     prerequisite: '4th level, not a multiclass character',
     description:
       'Choose one skill proficiency granted to you by your class. Your proficiency bonus is doubled for ability checks made using that skill. Choose one saving throw proficiency granted by your class. Whenever you make that save, you can treat a d20 roll of 9 or lower as a 10. If you lose this feat because you don\'t meet its prerequisite, you gain Multidisciplinary instead.',
@@ -115,12 +123,14 @@ export const FEATS: DnDFeat[] = [
   {
     name: 'Magic of the Blade',
     type: 'general',
+    abilityIncrease: ['strength', 'dexterity', 'constitution', 'intelligence', 'wisdom', 'charisma'],
     description:
       'Increase one ability score of your choice by 1, to a maximum of 20. You learn two cantrips that require you to make an unarmed strike or melee weapon attack as part of casting the spell. Choose INT, WIS, or CHA as the spellcasting ability for these cantrips.',
   },
   {
     name: 'Martial Initiate',
     type: 'general',
+    abilityIncrease: ['strength', 'dexterity', 'constitution', 'intelligence', 'wisdom', 'charisma'],
     prerequisite: '4th level',
     description:
       'Increase one ability score of your choice by 1, to a maximum of 20. You learn two tier 1 advanced techniques of your choice from any technique tree. You must meet the prerequisites for those techniques.',
@@ -128,6 +138,7 @@ export const FEATS: DnDFeat[] = [
   {
     name: 'Multidisciplinary',
     type: 'general',
+    skillChoices: { count: 1 }, savingThrowChoice: true,
     prerequisite: 'You are a multiclass character',
     description:
       'When you take this feat, and each time you gain your 1st level in a new class, choose one: gain proficiency in one skill and one type of artisan\'s tools, OR choose one saving throw proficiency that the newly multiclassed class provides at 1st level (you become proficient in it).',
@@ -160,12 +171,14 @@ export const FEATS: DnDFeat[] = [
   {
     name: 'Tengu Training',
     type: 'general',
+    abilityIncrease: ['dexterity', 'wisdom'],
     description:
       'You gain the following benefits from hanataka tengu tutelage: Increase your Dexterity or Wisdom score by 1, to a maximum of 20. You gain proficiency with one Finesse weapon of your choice. As a reaction when a creature misses you with a melee attack while you hold a Finesse weapon, you can make one weapon attack with that weapon against the creature. Uses equal to proficiency bonus per long rest.',
   },
   {
     name: 'Tessen Master',
     type: 'general',
+    abilityIncrease: ['strength', 'dexterity'],
     prerequisite: 'Proficiency with tessen',
     description:
       'Increase your Strength or Dexterity score by 1, to a maximum of 20. For you, a tessen has the Adaptable (Piercing) and Thrown (range 20/60) properties. While wielding a tessen, you gain an extra reaction each round (usable only for the Fan Shield deflection, and not on the same turn as your normal reaction).',
@@ -177,6 +190,7 @@ export const FEATS: DnDFeat[] = [
   {
     name: 'Actor',
     type: 'general',
+    abilityIncrease: ['charisma'],
     description:
       "Increase your Charisma score by 1, to a maximum of 20. You gain expertise in Deception and Performance (you also gain proficiency in them if you lack it).",
   },
@@ -188,6 +202,7 @@ export const FEATS: DnDFeat[] = [
   {
     name: 'Athlete',
     type: 'general',
+    abilityIncrease: ['strength', 'dexterity'],
     description:
       "Increase your Strength or Dexterity score by 1, to a maximum of 20. Standing up from prone costs far less movement, and your jump distance increases by 50%.",
   },
@@ -225,6 +240,7 @@ export const FEATS: DnDFeat[] = [
   {
     name: 'Durable',
     type: 'general',
+    abilityIncrease: ['constitution'],
     description:
       "Increase your Constitution score by 1, to a maximum of 20. You regain all of your hit points whenever you finish a short rest.",
   },
@@ -243,6 +259,7 @@ export const FEATS: DnDFeat[] = [
   {
     name: 'Heavily Armoured',
     type: 'general',
+    abilityIncrease: ['strength'],
     prerequisite: 'Proficiency with medium armour',
     description:
       "Increase your Strength score by 1, to a maximum of 20. You gain proficiency with heavy armour.",
@@ -250,6 +267,7 @@ export const FEATS: DnDFeat[] = [
   {
     name: 'Heavy Armour Master',
     type: 'general',
+    abilityIncrease: ['strength'],
     prerequisite: 'Proficiency with heavy armour',
     description:
       "Increase your Strength score by 1, to a maximum of 20. While you wear heavy armour, damage you take from non-magical attacks is reduced by 3.",
@@ -257,6 +275,7 @@ export const FEATS: DnDFeat[] = [
   {
     name: 'Lightly Armoured',
     type: 'general',
+    abilityIncrease: ['strength', 'dexterity'],
     description:
       "Increase your Strength or Dexterity score by 1, to a maximum of 20. You gain proficiency with light armour.",
   },
@@ -330,6 +349,7 @@ export const FEATS: DnDFeat[] = [
   {
     name: 'Moderately Armoured',
     type: 'general',
+    abilityIncrease: ['strength', 'dexterity'],
     prerequisite: 'Proficiency with light armour',
     description:
       "Increase your Strength or Dexterity score by 1, to a maximum of 20. You gain proficiency with medium armour and shields.",
@@ -337,6 +357,7 @@ export const FEATS: DnDFeat[] = [
   {
     name: 'Performer',
     type: 'general',
+    abilityIncrease: ['charisma'],
     description:
       "Increase your Charisma score by 1, to a maximum of 20. You gain proficiency with a musical instrument of your choice.",
   },
@@ -349,6 +370,7 @@ export const FEATS: DnDFeat[] = [
   {
     name: 'Resilient',
     type: 'general',
+    abilityIncrease: ['strength', 'dexterity', 'constitution', 'intelligence', 'wisdom', 'charisma'],
     description:
       "Choose one ability score. Increase it by 1, to a maximum of 20, and gain proficiency in saving throws with that ability.",
   },
@@ -385,6 +407,7 @@ export const FEATS: DnDFeat[] = [
   {
     name: 'Skilled',
     type: 'general',
+    skillChoices: { count: 3 },
     description: "You gain proficiency in 3 skills of your choice.",
   },
   {
@@ -396,6 +419,7 @@ export const FEATS: DnDFeat[] = [
   {
     name: 'Tavern Brawler',
     type: 'general',
+    abilityIncrease: ['strength', 'constitution'],
     description:
       "Increase your Strength or Constitution score by 1, to a maximum of 20. When you make an unarmed attack, use an improvised weapon, or throw something, you add your Strength modifier twice to the attack and damage rolls.",
   },
@@ -413,6 +437,7 @@ export const FEATS: DnDFeat[] = [
   {
     name: 'Weapon Master',
     type: 'general',
+    abilityIncrease: ['strength', 'dexterity'],
     description:
       "Increase your Strength or Dexterity score by 1, to a maximum of 20. You gain proficiency with four weapon types of your choice.",
   },
@@ -431,6 +456,7 @@ export const FEATS: DnDFeat[] = [
   {
     name: 'Draconic Fury',
     type: 'racial',
+    abilityIncrease: ['constitution'],
     prerequisite: 'Tatsumi (Ryujin)',
     racialRequirement: { race: 'Tatsumi', subrace: 'Ryujin' },
     description:
@@ -439,6 +465,7 @@ export const FEATS: DnDFeat[] = [
   {
     name: "Enkoh's Might",
     type: 'racial',
+    abilityIncrease: ['strength'],
     prerequisite: 'Enkoh (Hulking)',
     racialRequirement: { race: 'Enkoh', subrace: 'Hulking' },
     description:
@@ -447,6 +474,7 @@ export const FEATS: DnDFeat[] = [
   {
     name: 'Gift of the Lion Turtle',
     type: 'racial',
+    abilityIncrease: ['strength', 'dexterity', 'constitution', 'intelligence', 'wisdom', 'charisma'],
     prerequisite: 'Ryokido',
     racialRequirement: { race: 'Ryokido' },
     description:
@@ -471,6 +499,7 @@ export const FEATS: DnDFeat[] = [
   {
     name: 'Isetsu Magic',
     type: 'racial',
+    abilityIncrease: ['strength', 'dexterity', 'constitution', 'intelligence', 'wisdom', 'charisma'],
     prerequisite: 'Isetsu',
     racialRequirement: { race: 'Isetsu' },
     description:
@@ -479,6 +508,7 @@ export const FEATS: DnDFeat[] = [
   {
     name: 'Karasu Trickery',
     type: 'racial',
+    abilityIncrease: ['charisma'],
     prerequisite: 'Tengu (Karasu)',
     racialRequirement: { race: 'Tengu', subrace: 'Karasu' },
     description:
@@ -495,6 +525,7 @@ export const FEATS: DnDFeat[] = [
   {
     name: 'Oni Regeneration',
     type: 'racial',
+    abilityIncrease: ['constitution'],
     prerequisite: 'Oniborne',
     racialRequirement: { race: 'Oniborne' },
     description:
@@ -503,6 +534,7 @@ export const FEATS: DnDFeat[] = [
   {
     name: 'Seasonal Determinism',
     type: 'racial',
+    abilityIncrease: ['dexterity', 'charisma', 'wisdom', 'constitution'],
     prerequisite: 'Fuyoren',
     racialRequirement: { race: 'Fuyoren' },
     description:
@@ -511,6 +543,7 @@ export const FEATS: DnDFeat[] = [
   {
     name: 'Shadowmage',
     type: 'racial',
+    abilityIncrease: ['intelligence', 'wisdom', 'charisma'],
     prerequisite: 'Tengu (Hanataka)',
     racialRequirement: { race: 'Tengu', subrace: 'Hanataka' },
     description:
@@ -519,6 +552,7 @@ export const FEATS: DnDFeat[] = [
   {
     name: 'Springtail Agility',
     type: 'racial',
+    abilityIncrease: ['dexterity'],
     prerequisite: 'Enkoh (Springtail)',
     racialRequirement: { race: 'Enkoh', subrace: 'Springtail' },
     description:

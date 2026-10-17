@@ -5,6 +5,7 @@ import type {
 } from '../types/character';
 import { getRace } from '../data/races';
 import { getClass } from '../data/classes';
+import { FEATS } from '../data/feats';
 
 export const ABILITY_KEYS: AbilityScoreKey[] = [
   'strength',
@@ -109,11 +110,70 @@ export function getRacialBonuses(character: Character): AbilityScores {
   return totals;
 }
 
+/** The ability a feat increases for this character, if it has been decided. */
+export function getFeatAbilityChoice(
+  character: Character,
+  featName: string
+): AbilityScoreKey | undefined {
+  const feat = FEATS.find((f) => f.name === featName);
+  const options = feat?.abilityIncrease;
+  if (!options || options.length === 0) return undefined;
+  if (options.length === 1) return options[0];
+  const choice = character.featChoices?.[featName] as AbilityScoreKey | undefined;
+  return choice && options.includes(choice) ? choice : undefined;
+}
+
+/** Skills the player picked for a feat (stored comma-separated in featChoices). */
+export function getFeatSkills(character: Character, featName: string): string[] {
+  if (!(character.feats ?? []).includes(featName)) return [];
+  const raw = character.featChoices?.[featName] ?? '';
+  return raw.split(',').map((x) => x.trim()).filter(Boolean);
+}
+
+/** Skills that gain proficiency from feat choices. */
+function getFeatSkillProficiencies(character: Character): string[] {
+  const out: string[] = [];
+  for (const feat of FEATS) {
+    if (!feat.skillChoices || feat.skillExpertise) continue;
+    out.push(...getFeatSkills(character, feat.name));
+  }
+  return out;
+}
+
+/** +1 ability score increases from owned feats (each stops at a score of 20). */
+export function getFeatBonuses(character: Character): AbilityScores {
+  const bonuses = emptyScores();
+  const racial = getRacialBonuses(character);
+  for (const featName of character.feats ?? []) {
+    const key = getFeatAbilityChoice(character, featName);
+    if (!key) continue;
+    const current = character.abilityScores[key] + racial[key] + bonuses[key];
+    bonuses[key] += Math.max(0, Math.min(1, 20 - current));
+  }
+  return bonuses;
+}
+
+/** Extra walking speed (ft.) from owned feats. */
+export function getFeatSpeedBonus(character: Character): number {
+  const feats = character.feats ?? [];
+  let bonus = 0;
+  if (feats.includes('Mobile')) bonus += 10;
+  if (feats.includes('Boon of the Wanyūdō')) bonus += 10;
+  if (
+    feats.includes('Seasonal Determinism') &&
+    getFeatAbilityChoice(character, 'Seasonal Determinism') === 'dexterity'
+  ) {
+    bonus += 5;
+  }
+  return bonus;
+}
+
 export function getTotalAbilityScores(character: Character): AbilityScores {
   const bonuses = getRacialBonuses(character);
+  const featBonuses = getFeatBonuses(character);
   const totals = { ...character.abilityScores };
   for (const key of ABILITY_KEYS) {
-    totals[key] += bonuses[key];
+    totals[key] += bonuses[key] + featBonuses[key];
   }
   return totals;
 }
@@ -129,6 +189,16 @@ export function getSavingThrowProficiencies(character: Character): AbilityScoreK
       set.add(save as AbilityScoreKey);
     }
   }
+  // Resilient feat: proficiency in the chosen ability's saving throws
+  if ((character.feats ?? []).includes('Resilient')) {
+    const chosen = getFeatAbilityChoice(character, 'Resilient');
+    if (chosen) set.add(chosen);
+  }
+  // Multidisciplinary feat: a saving throw proficiency from a multiclass
+  if ((character.feats ?? []).includes('Multidisciplinary')) {
+    const chosen = character.featChoices?.['Multidisciplinary:save'];
+    if (chosen) set.add(chosen as AbilityScoreKey);
+  }
   return [...set];
 }
 
@@ -138,7 +208,11 @@ export function isProficientInSkill(
 ): boolean {
   return (
     character.background.skills.includes(skill) ||
-    character.skillProficiencies.includes(skill)
+    character.skillProficiencies.includes(skill) ||
+    getFeatSkillProficiencies(character).includes(skill) ||
+    // Actor feat: proficiency (and expertise) in Deception and Performance
+    ((character.feats ?? []).includes('Actor') &&
+      (skill === 'Deception' || skill === 'Performance'))
   );
 }
 
@@ -146,7 +220,14 @@ export function hasExpertiseInSkill(
   character: Character,
   skill: string
 ): boolean {
-  return character.skillExpertise.includes(skill);
+  return (
+    character.skillExpertise.includes(skill) ||
+    // Focused Discipline feat: proficiency bonus doubled for the chosen skill
+    (getFeatSkills(character, 'Focused Discipline').includes(skill) &&
+      isProficientInSkill(character, skill)) ||
+    ((character.feats ?? []).includes('Actor') &&
+      (skill === 'Deception' || skill === 'Performance'))
+  );
 }
 
 /* ---------- Skill / save modifiers ---------- */

@@ -10,6 +10,7 @@ import SpellsTab from './tabs/SpellsTab';
 import InventoryTab from './tabs/InventoryTab';
 import AdvancedWeaponMasteryTab from './tabs/AdvancedWeaponMasteryTab';
 import TamerTab from './tabs/TamerTab';
+import FeatSpellsPanel from './tabs/FeatSpellsPanel';
 import LevelUpWizard from './LevelUpWizard';
 import RestMenu from './RestMenu';
 import ResourcesPanel from './tabs/ResourcesPanel';
@@ -20,10 +21,14 @@ import { computeMaxHP } from '../../utils/calculations';
 import {
   getInitiative,
   getModifier,
+  getFeatBonuses,
+  getFeatSpeedBonus,
+  getProficiencyBonus,
   getRacialBonuses,
 } from '../../utils/calculations';
 import { formatModifier } from '../../utils/dice';
 import Rollable from '../shared/Rollable';
+import { COMMON_RESOURCES } from '../../data/restResources';
 
 interface Props {
   characterId: string;
@@ -82,6 +87,23 @@ export default function CharacterSheet({ characterId }: Props) {
     character?.classes.map((c) => c.level).join(','),
     (character?.feats ?? []).join(','),
   ]);
+
+  // Keep proficiency-bonus resources (feat uses) in step with character level
+  useEffect(() => {
+    if (!character) return;
+    const pb = getProficiencyBonus(character.level);
+    const scaling = new Set(
+      COMMON_RESOURCES.filter((t) => t.scalesWithProficiency).map((t) => t.name)
+    );
+    const resources = character.resources ?? [];
+    if (!resources.some((r) => scaling.has(r.name) && r.max !== pb)) return;
+    updateCharacter(character.id, {
+      resources: resources.map((r) =>
+        scaling.has(r.name) && r.max !== pb ? { ...r, max: pb } : r
+      ),
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [character?.level]);
 
   return (
     <div>
@@ -151,7 +173,12 @@ export default function CharacterSheet({ characterId }: Props) {
         )}
         {activeTab === 'features' && <FeaturesTab characterId={characterId} />}
         {activeTab === 'feats' && <FeatsTab characterId={characterId} />}
-        {activeTab === 'spells' && <SpellsTab characterId={characterId} />}
+        {activeTab === 'spells' && (
+          <>
+            <FeatSpellsPanel characterId={characterId} />
+            <SpellsTab characterId={characterId} />
+          </>
+        )}
         {activeTab === 'weapon-mastery' && (
           <AdvancedWeaponMasteryTab characterId={characterId} />
         )}
@@ -183,6 +210,8 @@ function OverviewTab({ characterId }: { characterId: string }) {
   if (!character) return null;
 
   const racialBonuses = getRacialBonuses(character);
+  const featBonuses = getFeatBonuses(character);
+  const featSpeedBonus = getFeatSpeedBonus(character);
 
   const initiative = getInitiative(character);
 
@@ -203,7 +232,8 @@ function OverviewTab({ characterId }: { characterId: string }) {
           ).map((key) => {
             const base = character.abilityScores[key];
             const racial = racialBonuses[key];
-            const total = base + racial;
+            const featBonus = featBonuses[key];
+            const total = base + racial + featBonus;
             const mod = getModifier(total);
 
             return (
@@ -240,6 +270,11 @@ function OverviewTab({ characterId }: { characterId: string }) {
                       {racial > 0 ? `+${racial}` : racial} racial
                     </div>
                   )}
+                  {featBonus !== 0 && (
+                    <div className="text-jade font-semibold">
+                      +{featBonus} feat
+                    </div>
+                  )}
                   <div className="text-gray-700">
                     Total <span className="font-bold text-ink">{total}</span>
                   </div>
@@ -252,7 +287,7 @@ function OverviewTab({ characterId }: { characterId: string }) {
           })}
         </div>
         <p className="text-xs text-gray-500 mt-2">
-          Enter base scores above. Racial bonuses from your race/subrace apply automatically.
+          Enter base scores above. Racial bonuses and feat increases apply automatically.
         </p>
       </div>
 
@@ -330,6 +365,11 @@ function OverviewTab({ characterId }: { characterId: string }) {
               }
               className="w-full border border-gray-300 rounded px-2 py-1"
             />
+            {featSpeedBonus > 0 && (
+              <div className="text-xs text-jade font-semibold mt-0.5">
+                +{featSpeedBonus} ft. from feats = {character.combat.speed + featSpeedBonus} ft.
+              </div>
+            )}
           </div>
             <div className="col-span-2">
             <label className="block text-xs uppercase font-semibold text-gray-500">

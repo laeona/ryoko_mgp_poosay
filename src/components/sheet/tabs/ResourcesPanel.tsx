@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useCharacterStore } from '../../../store/characterStore';
-import { COMMON_RESOURCES } from '../../../data/restResources';
+import { COMMON_RESOURCES, getResourceMax } from '../../../data/restResources';
 import type { Resource } from '../../../types/character';
 
 interface Props {
@@ -67,7 +67,7 @@ export default function ResourcesPanel({ characterId }: Props) {
                   key={tmpl.name}
                   onClick={() =>
                     !already &&
-                    addResource(tmpl.name, tmpl.defaultMax, tmpl.rechargeOn)
+                    addResource(tmpl.name, getResourceMax(tmpl, character.level), tmpl.rechargeOn)
                   }
                   disabled={already}
                   className={`text-left p-2 rounded text-sm transition ${

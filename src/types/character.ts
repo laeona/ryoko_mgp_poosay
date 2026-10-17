@@ -29,6 +29,8 @@ export interface Character {
     flaw?: string;
   };
   feats: string[];
+  /** Choices made for feats (e.g. which ability a feat increases), keyed by feat name. */
+  featChoices?: Record<string, string>;
   spellcasting?: SpellcastingData;
   bender?: BenderData;
   tamer?: TamerData;
@@ -276,6 +278,14 @@ export interface DnDFeat {
   description: string;
   prerequisite?: string;
   type: 'general' | 'racial';
+  /** Ability scores this feat can increase by 1 (max 20). One option = automatic; several = player picks. */
+  abilityIncrease?: AbilityScoreKey[];
+  /** Skill proficiencies the player picks for this feat (options omitted = any skill). */
+  skillChoices?: { count: number; options?: string[] };
+  /** Feat grants a saving throw proficiency of the player's choice. */
+  savingThrowChoice?: boolean;
+  /** Feat doubles proficiency (expertise) in the chosen skill. */
+  skillExpertise?: boolean;
   /** For racial feats only: which race/subrace qualifies */
   racialRequirement?: {
     race: string;

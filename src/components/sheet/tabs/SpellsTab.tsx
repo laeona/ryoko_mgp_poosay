@@ -92,8 +92,8 @@ export default function SpellsTab({ characterId }: Props) {
     return (
       <div className="bg-white rounded-lg shadow p-8 text-center">
         <p className="text-gray-600">
-          This character doesn't have spellcasting. Add a spellcasting class
-          on the Class tab.
+          This character has no class spellcasting. Add a spellcasting class
+          on the Class tab. Spells from feats are listed above.
         </p>
       </div>
     );

@@ -12,6 +12,14 @@ import {
   isSensei,
 } from '../../../data/tamer';
 import type { Companion } from '../../../types/character';
+import {
+  FAMILIARS,
+  createBespokeCompanion,
+  getFamiliar,
+} from '../../../data/familiars';
+import { getProficiencyBonus } from '../../../utils/calculations';
+import BespokeFamiliarCard from './BespokeFamiliarCard';
+import SpiritBondedSection from './SpiritBondedSection';
 
 interface Props {
   characterId: string;
@@ -27,6 +35,11 @@ export default function TamerTab({ characterId }: Props) {
 
   const tamerLevel = getTamerLevel(character.classes);
   const sensei = isSensei(character.classes);
+  const proficiencyBonus = getProficiencyBonus(character.level);
+
+  if (tamerLevel === 0 && character.feats.includes('Spirit Bonded')) {
+    return <SpiritBondedSection characterId={characterId} />;
+  }
 
   if (tamerLevel === 0) {
     return (
@@ -76,6 +89,21 @@ export default function TamerTab({ characterId }: Props) {
       notes: '',
     };
     updateTamer({ companions: [...companions, newCompanion] });
+  };
+
+  const addBespokeFamiliar = (familiarId: string) => {
+    const familiar = getFamiliar(familiarId);
+    if (!familiar) return;
+    if (companions.length >= prog.maxCompanions) {
+      alert(`You already have the maximum ${prog.maxCompanions} companions at Tamer ${tamerLevel}.`);
+      return;
+    }
+    updateTamer({
+      companions: [
+        ...companions,
+        createBespokeCompanion(familiar, tamerLevel, proficiencyBonus),
+      ],
+    });
   };
 
   const updateCompanion = (id: string, updates: Partial<Companion>) => {
@@ -140,6 +168,21 @@ export default function TamerTab({ characterId }: Props) {
         >
           + Add Companion
         </button>
+        <select
+          value=""
+          onChange={(e) => {
+            if (e.target.value) addBespokeFamiliar(e.target.value);
+          }}
+          disabled={companions.length >= prog.maxCompanions}
+          className="px-3 py-2 border border-gray-300 rounded bg-white text-sm disabled:bg-gray-200 disabled:text-gray-400"
+        >
+          <option value="">+ Add bespoke familiar...</option>
+          {FAMILIARS.map((f) => (
+            <option key={f.id} value={f.id}>
+              {f.name} ({f.creatureType})
+            </option>
+          ))}
+        </select>
         {companions.length === 0 && (
           <span className="text-sm text-gray-500">
             No companions yet. Add your first bonded companion.
@@ -157,6 +200,30 @@ export default function TamerTab({ characterId }: Props) {
           {companions.map((c) => {
             const compProg = getCompanionProgression(tamerLevel, c.cr);
             const isActive = tamer.activeCompanionId === c.id;
+            const familiar = getFamiliar(c.familiarId);
+            if (familiar) {
+              return (
+                <BespokeFamiliarCard
+                  key={c.id}
+                  companion={c}
+                  familiar={familiar}
+                  tamerLevel={tamerLevel}
+                  proficiencyBonus={proficiencyBonus}
+                  improvementBudget={compProg.imp}
+                  isActive={isActive}
+                  sensei={sensei}
+                  senseiStrikeDie={getSenseiStrikeDie(tamerLevel)}
+                  senseiStrikeCount={getSenseiStrikeCount(tamerLevel)}
+                  onUpdate={(u) => updateCompanion(c.id, u)}
+                  onRemove={() => removeCompanion(c.id)}
+                  onToggleActive={() =>
+                    updateTamer({
+                      activeCompanionId: isActive ? undefined : c.id,
+                    })
+                  }
+                />
+              );
+            }
             return (
               <CompanionCard
                 key={c.id}
@@ -461,4 +528,4 @@ function CompanionCard({
       )}
     </div>
   );
-}
+}

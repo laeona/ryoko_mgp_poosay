@@ -84,6 +84,10 @@ export interface Companion {
   ac: number;
   speed: string;
   improvements: string[];
+  /** Bespoke familiar id (see data/familiars.ts). When set, stats are calculated automatically. */
+  familiarId?: string;
+  /** Improvement ids learned by a bespoke familiar (its free bonus improvement is implicit). */
+  learnedImprovements?: string[];
   senseiStrikes?: number;
   senseiTechniques?: string[];
   notes: string;

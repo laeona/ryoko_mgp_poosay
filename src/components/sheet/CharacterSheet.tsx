@@ -77,7 +77,11 @@ export default function CharacterSheet({ characterId }: Props) {
       });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [totalLevel, character?.classes.map((c) => c.level).join(',')]);
+  }, [
+    totalLevel,
+    character?.classes.map((c) => c.level).join(','),
+    (character?.feats ?? []).join(','),
+  ]);
 
   return (
     <div>

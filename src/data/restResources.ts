@@ -41,4 +41,7 @@ export const COMMON_RESOURCES: ResourceTemplate[] = [
   { name: 'Boon of the Ōmukade', rechargeOn: 'long', defaultMax: 2, description: 'Feat. Resistance reaction.' },
   { name: 'Boon of the Wanyūdō', rechargeOn: 'short', defaultMax: 2, description: 'Feat. Charging slam.' },
   { name: 'Spirit Bonded', rechargeOn: 'long', defaultMax: 1, description: 'Feat. Summon your bonded familiar.' },
+  { name: 'Lucky', rechargeOn: 'long', defaultMax: 3, description: 'Feat. Luck points: advantage on a check, attack or save, or force an enemy reroll.' },
+  { name: 'Martial Adept', rechargeOn: 'short', defaultMax: 1, description: 'Feat. Superiority die for your Battle Master manoeuvres.' },
+  { name: 'Magic Initiate', rechargeOn: 'long', defaultMax: 1, description: 'Feat. Cast your 1st-level spell once per long rest.' },
 ];

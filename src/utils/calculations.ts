@@ -182,7 +182,8 @@ export function getPassivePerception(character: Character): number {
 
 export function getInitiative(character: Character): number {
   const totals = getTotalAbilityScores(character);
-  return getModifier(totals.dexterity);
+  const alertBonus = (character.feats ?? []).includes('Alert') ? 5 : 0;
+  return getModifier(totals.dexterity) + alertBonus;
 }
 
 /* ---------- Spellcasting ---------- */
@@ -279,6 +280,9 @@ export function computeMaxHP(character: Character): number {
     const val = rolls[i] ?? avg;
     total += Math.max(1, val) + conMod;
   }
+
+  // Tough feat: +2 max HP per level
+  if ((character.feats ?? []).includes('Tough')) total += 2 * totalLevel;
 
   return Math.max(1, total);
 }

@@ -171,6 +171,252 @@ export const FEATS: DnDFeat[] = [
       'Increase your Strength or Dexterity score by 1, to a maximum of 20. For you, a tessen has the Adaptable (Piercing) and Thrown (range 20/60) properties. While wielding a tessen, you gain an extra reaction each round (usable only for the Fan Shield deflection, and not on the same turn as your normal reaction).',
   },
 
+    // ============================================================
+  // ADDITIONAL GENERAL FEATS
+  // ============================================================
+  {
+    name: 'Actor',
+    type: 'general',
+    description:
+      "Increase your Charisma score by 1, to a maximum of 20. You gain expertise in Deception and Performance (you also gain proficiency in them if you lack it).",
+  },
+  {
+    name: 'Alert',
+    type: 'general',
+    description: "You gain a +5 bonus to initiative and cannot be surprised.",
+  },
+  {
+    name: 'Athlete',
+    type: 'general',
+    description:
+      "Increase your Strength or Dexterity score by 1, to a maximum of 20. Standing up from prone costs far less movement, and your jump distance increases by 50%.",
+  },
+  {
+    name: 'Charger',
+    type: 'general',
+    description:
+      "Charge in a straight line toward the first enemy in your way without provoking opportunity attacks, then either make a melee weapon attack or shove them. The weapon attack uses your action and bonus action, moves you up to 30 ft, and deals +5 damage; it counts as a single weapon attack, so Extra Attack applies. Shove distance depends on your Strength and the target's weight.",
+  },
+  {
+    name: 'Crossbow Expert',
+    type: 'general',
+    description:
+      "Crossbow attacks made within melee range no longer have disadvantage. The wounds your piercing crossbow shots inflict last twice as long.",
+  },
+  {
+    name: 'Defensive Duellist',
+    type: 'general',
+    prerequisite: 'Dexterity 13 or higher',
+    description:
+      "While wielding a finesse weapon you are proficient with in your main hand, you can use your reaction when a creature makes a melee attack against you to add your proficiency bonus to your Armour Class against that attack, possibly causing it to miss.",
+  },
+  {
+    name: 'Dual Wielder',
+    type: 'general',
+    description:
+      "You can fight with two melee weapons even if they are not Light, as long as neither is Two-Handed. You gain a +1 bonus to Armour Class while wielding a melee weapon in each hand. This feat does not grant the Two-Weapon Fighting style, so without that style you still do not add your ability modifier to off-hand damage.",
+  },
+  {
+    name: 'Dungeon Delver',
+    type: 'general',
+    description:
+      "You have advantage on Perception checks to detect hidden objects and on saving throws to avoid or resist traps, and you have resistance to damage dealt by traps.",
+  },
+  {
+    name: 'Durable',
+    type: 'general',
+    description:
+      "Increase your Constitution score by 1, to a maximum of 20. You regain all of your hit points whenever you finish a short rest.",
+  },
+  {
+    name: 'Elemental Adept',
+    type: 'general',
+    description:
+      "Choose one damage type: acid, cold, lightning, fire or thunder. Your spells and attacks ignore resistance to that damage type, and when you roll a 1 on a damage die for a spell of that type, you treat it as a 2.",
+  },
+  {
+    name: 'Great Weapon Master',
+    type: 'general',
+    description:
+      "When you score a critical hit with a melee weapon or reduce a creature to 0 hit points with one, you can make another melee weapon attack as a bonus action. When you attack with a two-handed or versatile melee weapon held in both hands that you are proficient with, you can take a -5 penalty to the attack roll to deal an extra 10 damage (toggleable).",
+  },
+  {
+    name: 'Heavily Armoured',
+    type: 'general',
+    prerequisite: 'Proficiency with medium armour',
+    description:
+      "Increase your Strength score by 1, to a maximum of 20. You gain proficiency with heavy armour.",
+  },
+  {
+    name: 'Heavy Armour Master',
+    type: 'general',
+    prerequisite: 'Proficiency with heavy armour',
+    description:
+      "Increase your Strength score by 1, to a maximum of 20. While you wear heavy armour, damage you take from non-magical attacks is reduced by 3.",
+  },
+  {
+    name: 'Lightly Armoured',
+    type: 'general',
+    description:
+      "Increase your Strength or Dexterity score by 1, to a maximum of 20. You gain proficiency with light armour.",
+  },
+  {
+    name: 'Lucky',
+    type: 'general',
+    description:
+      "You have 3 luck points, which you regain on a long rest. You can spend a luck point to gain advantage on your next ability check, to gain advantage on your next attack roll or saving throw, or to force an enemy to reroll an attack roll against you.",
+  },
+  {
+    name: 'Mage Slayer',
+    type: 'general',
+    description:
+      "When a creature casts a spell within melee range of you, you have advantage on saving throws against it, and you can use your reaction to immediately make an attack against the caster if it is within 5 ft of you. Enemies you hit have disadvantage on saving throws to maintain concentration.",
+  },
+  {
+    name: 'Magic Initiate: Bard',
+    type: 'general',
+    description:
+      "Learn two cantrips and one 1st-level spell from the bard spell list. You can cast the 1st-level spell once per long rest. Charisma is your spellcasting ability for these spells.",
+  },
+  {
+    name: 'Magic Initiate: Cleric',
+    type: 'general',
+    description:
+      "Learn two cantrips and one 1st-level spell from the cleric spell list. You can cast the 1st-level spell once per long rest. Wisdom is your spellcasting ability for these spells.",
+  },
+  {
+    name: 'Magic Initiate: Druid',
+    type: 'general',
+    description:
+      "Learn two cantrips and one 1st-level spell from the druid spell list. You can cast the 1st-level spell once per long rest. Wisdom is your spellcasting ability for these spells.",
+  },
+  {
+    name: 'Magic Initiate: Sorcerer',
+    type: 'general',
+    description:
+      "Learn two cantrips and one 1st-level spell from the sorcerer spell list. You can cast the 1st-level spell once per long rest. Charisma is your spellcasting ability for these spells.",
+  },
+  {
+    name: 'Magic Initiate: Warlock',
+    type: 'general',
+    description:
+      "Learn two cantrips and one 1st-level spell from the warlock spell list. You can cast the 1st-level spell once per long rest. Charisma is your spellcasting ability for these spells.",
+  },
+  {
+    name: 'Magic Initiate: Wizard',
+    type: 'general',
+    description:
+      "Learn two cantrips and one 1st-level spell from the wizard spell list. You can cast the 1st-level spell once per long rest. Intelligence is your spellcasting ability for these spells.",
+  },
+  {
+    name: 'Martial Adept',
+    type: 'general',
+    description:
+      "Learn two manoeuvres from the Battle Master archetype and gain one superiority die to fuel them. You regain expended superiority dice after a short or long rest.",
+  },
+  {
+    name: 'Medium Armour Master',
+    type: 'general',
+    prerequisite: 'Proficiency with medium armour',
+    description:
+      "Wearing medium armour does not impose disadvantage on Stealth checks, and the Dexterity bonus to your Armour Class from medium armour can be +3 instead of +2.",
+  },
+  {
+    name: 'Mobile',
+    type: 'general',
+    description:
+      "Your speed increases by 10 ft. When you take the Dash action, difficult terrain does not slow you. If you make a melee attack against a creature, you do not provoke opportunity attacks from that creature for the rest of the turn.",
+  },
+  {
+    name: 'Moderately Armoured',
+    type: 'general',
+    prerequisite: 'Proficiency with light armour',
+    description:
+      "Increase your Strength or Dexterity score by 1, to a maximum of 20. You gain proficiency with medium armour and shields.",
+  },
+  {
+    name: 'Performer',
+    type: 'general',
+    description:
+      "Increase your Charisma score by 1, to a maximum of 20. You gain proficiency with a musical instrument of your choice.",
+  },
+  {
+    name: 'Polearm Master',
+    type: 'general',
+    description:
+      "When you attack with a glaive, halberd, pike, quarterstaff or spear, you can use a bonus action to make an attack with the butt end of the weapon. You can also make an opportunity attack against a creature that enters your reach.",
+  },
+  {
+    name: 'Resilient',
+    type: 'general',
+    description:
+      "Choose one ability score. Increase it by 1, to a maximum of 20, and gain proficiency in saving throws with that ability.",
+  },
+  {
+    name: 'Ritual Caster',
+    type: 'general',
+    description:
+      "You learn two ritual spells of your choice, such as Speak with Dead, Find Familiar, Longstrider, Enhance Leap, Disguise Self or Speak with Animals.",
+  },
+  {
+    name: 'Savage Attacker',
+    type: 'general',
+    description:
+      "When you make a melee weapon attack, you can roll the damage dice twice and use the higher result.",
+  },
+  {
+    name: 'Sentinel',
+    type: 'general',
+    description:
+      "When an enemy within melee range attacks one of your allies who does not have this feat, you can use your reaction to make a weapon attack against that enemy. When you hit a creature with an opportunity attack, it cannot move for the rest of its turn. You also have advantage on opportunity attacks.",
+  },
+  {
+    name: 'Sharpshooter',
+    type: 'general',
+    description:
+      "Your ranged weapon attacks are not penalised for attacking from low ground. When you attack with a ranged weapon you are proficient with, you can take a -5 penalty to the attack roll to deal an extra 10 damage (toggleable).",
+  },
+  {
+    name: 'Shield Master',
+    type: 'general',
+    description:
+      "While wielding a shield, you gain a +2 bonus to Dexterity saving throws. When a spell forces you to make a Dexterity saving throw, you can use your reaction to shield yourself: you take half damage on a failed save and no damage on a successful one.",
+  },
+  {
+    name: 'Skilled',
+    type: 'general',
+    description: "You gain proficiency in 3 skills of your choice.",
+  },
+  {
+    name: 'Spell Sniper',
+    type: 'general',
+    description:
+      "You learn one cantrip of your choice from Bone Chill, Eldritch Blast, Fire Bolt, Ray of Frost, Shocking Grasp or Thorn Whip, using your normal spellcasting ability. The roll needed to score a critical hit with a spell attack is reduced by 1; this can stack with other effects.",
+  },
+  {
+    name: 'Tavern Brawler',
+    type: 'general',
+    description:
+      "Increase your Strength or Constitution score by 1, to a maximum of 20. When you make an unarmed attack, use an improvised weapon, or throw something, you add your Strength modifier twice to the attack and damage rolls.",
+  },
+  {
+    name: 'Tough',
+    type: 'general',
+    description: "Your hit point maximum increases by 2 for each level you have.",
+  },
+  {
+    name: 'War Caster',
+    type: 'general',
+    description:
+      "You have advantage on saving throws to maintain concentration on a spell. You can also use your reaction to cast Shocking Grasp on a creature moving out of your melee range (this does not let you cast Shocking Grasp at will).",
+  },
+  {
+    name: 'Weapon Master',
+    type: 'general',
+    description:
+      "Increase your Strength or Dexterity score by 1, to a maximum of 20. You gain proficiency with four weapon types of your choice.",
+  },
+
   // ============================================================
   // RACIAL FEATS
   // ============================================================

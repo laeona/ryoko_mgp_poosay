@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useCharacterStore } from '../../../store/characterStore';
 import { ITEM_GROUPS } from '../../../data/items';
 import type { InventoryItem, ItemCategory } from '../../../types/character';
+import { getBackgroundTools } from '../../../data/backgroundEquipment';
 
 interface Props {
   characterId: string;
@@ -84,6 +85,8 @@ export default function InventoryTab({ characterId }: Props) {
       inventory: items.filter((i) => i.id !== id),
     });
   };
+
+  const toolProficiencies = getBackgroundTools(character).map((t) => t.toLowerCase());
 
   const filtered = filter === 'all' ? items : items.filter((i) => i.category === filter);
 
@@ -257,6 +260,7 @@ export default function InventoryTab({ characterId }: Props) {
             <ItemRow
               key={item.id}
               item={item}
+              proficient={toolProficiencies.includes(item.name.trim().toLowerCase())}
               onUpdate={(u) => updateItem(item.id, u)}
               onRemove={() => removeItem(item.id)}
             />
@@ -299,10 +303,12 @@ function FilterChip({
 
 function ItemRow({
   item,
+  proficient,
   onUpdate,
   onRemove,
 }: {
   item: InventoryItem;
+  proficient: boolean;
   onUpdate: (u: Partial<InventoryItem>) => void;
   onRemove: () => void;
 }) {
@@ -342,6 +348,14 @@ function ItemRow({
           onChange={(e) => onUpdate({ name: e.target.value })}
           className="flex-1 font-semibold border-b border-transparent hover:border-gray-300 focus:border-ember outline-none"
         />
+        {proficient && (
+          <span
+            className="text-xs font-semibold text-jade border border-jade rounded px-1.5 py-0.5 whitespace-nowrap"
+            title="You are proficient with this tool (from your background)"
+          >
+            Proficient
+          </span>
+        )}
 
         {/* Quantity */}
         <input

@@ -1,6 +1,11 @@
 import { useCharacterStore } from '../../../store/characterStore';
 import { BACKGROUNDS } from '../../../data/backgrounds';
 import { ABILITY_FULL_LABELS } from '../../../utils/calculations';
+import {
+  ALTERNATIVE_GOLD,
+  BACKGROUND_EQUIPMENT,
+  buildStartingItems,
+} from '../../../data/backgroundEquipment';
 
 interface Props {
   characterId: string;
@@ -44,6 +49,46 @@ export default function BackgroundTab({ characterId }: Props) {
           ? character.background.skills.filter((s) => s !== skill)
           : [...character.background.skills, skill],
       },
+    });
+  };
+
+  const equipment = selected ? BACKGROUND_EQUIPMENT[selected.name] : undefined;
+  const chosenTool = character.background.tools[0] ?? '';
+  const equipmentChoice = character.background.equipmentChoice;
+  const currency = character.currency ?? { gp: 0, sp: 0, cp: 0 };
+
+  const setTool = (tool: string) => {
+    updateCharacter(character.id, {
+      background: { ...character.background, tools: tool ? [tool] : [] },
+    });
+  };
+
+  // Add the starting package (or the gold alternative) to the inventory
+  const takeEquipment = (choice: 'package' | 'gold') => {
+    if (!selected || !equipment || equipmentChoice) return;
+    const newItems =
+      choice === 'package'
+        ? buildStartingItems(selected.name, chosenTool).map((it) => ({
+            ...it,
+            id: crypto.randomUUID(),
+          }))
+        : [];
+    const gold = choice === 'package' ? equipment.gold : ALTERNATIVE_GOLD;
+    updateCharacter(character.id, {
+      inventory: [...character.inventory, ...newItems],
+      currency: { ...currency, gp: currency.gp + gold },
+      background: { ...character.background, equipmentChoice: choice },
+    });
+  };
+
+  // Take back what the background added (only items it added, not your own)
+  const undoEquipment = () => {
+    if (!selected || !equipment || !equipmentChoice) return;
+    const gold = equipmentChoice === 'package' ? equipment.gold : ALTERNATIVE_GOLD;
+    updateCharacter(character.id, {
+      inventory: character.inventory.filter((i) => i.source !== 'background'),
+      currency: { ...currency, gp: Math.max(0, currency.gp - gold) },
+      background: { ...character.background, equipmentChoice: undefined },
     });
   };
 
@@ -167,7 +212,24 @@ export default function BackgroundTab({ characterId }: Props) {
                 <div className="text-xs uppercase text-gray-500 font-semibold">
                   Tool Proficiency
                 </div>
-                <div className="text-sm">{selected.toolProficiency}</div>
+                {equipment?.toolOptions ? (
+                  <select
+                    value={chosenTool}
+                    onChange={(e) => setTool(e.target.value)}
+                    disabled={Boolean(equipmentChoice)}
+                    className="w-full border border-gray-300 rounded px-2 py-1 text-sm bg-white mt-1"
+                    title={equipmentChoice ? 'Undo the starting equipment to change this' : undefined}
+                  >
+                    <option value="">{selected.toolProficiency} - choose...</option>
+                    {equipment.toolOptions.map((t) => (
+                      <option key={t} value={t}>
+                        {t}
+                      </option>
+                    ))}
+                  </select>
+                ) : (
+                  <div className="text-sm">{selected.toolProficiency}</div>
+                )}
               </div>
               <div className="bg-gray-50 rounded p-3">
                 <div className="text-xs uppercase text-gray-500 font-semibold">
@@ -183,6 +245,60 @@ export default function BackgroundTab({ characterId }: Props) {
                 Equipment
               </div>
               <div className="text-sm">{selected.equipment}</div>
+              {equipment && (
+                <div className="mt-3 border-t border-gray-200 pt-3 space-y-2">
+                  {equipmentChoice ? (
+                    <div className="flex items-center justify-between gap-3 flex-wrap">
+                      <span className="text-sm text-jade font-semibold">
+                        {equipmentChoice === 'package'
+                          ? `Starting package added to your inventory (+${equipment.gold} gp).`
+                          : `Took ${ALTERNATIVE_GOLD} gp instead (added to your currency).`}
+                      </span>
+                      <button
+                        type="button"
+                        onClick={undoEquipment}
+                        className="px-3 py-1 text-xs bg-red-100 text-red-700 rounded hover:bg-red-200"
+                      >
+                        Undo
+                      </button>
+                    </div>
+                  ) : (
+                    <>
+                      <ul className="text-xs text-gray-600 list-disc pl-5">
+                        {equipment.items.map((it, i) => (
+                          <li key={i}>
+                            {it.toolChoice ? chosenTool || 'Your chosen tool' : it.name}
+                            {it.quantity && it.quantity > 1 ? ` x${it.quantity}` : ''}
+                          </li>
+                        ))}
+                        {equipment.gold > 0 && <li>{equipment.gold} gp</li>}
+                      </ul>
+                      <div className="flex gap-2 flex-wrap">
+                        <button
+                          type="button"
+                          onClick={() => takeEquipment('package')}
+                          disabled={Boolean(equipment.toolOptions) && !chosenTool}
+                          className="px-3 py-1 text-sm bg-jade text-white rounded hover:bg-green-800 disabled:opacity-40 disabled:cursor-not-allowed"
+                        >
+                          Add package to inventory
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => takeEquipment('gold')}
+                          className="px-3 py-1 text-sm bg-gray-200 rounded hover:bg-gray-300"
+                        >
+                          Take {ALTERNATIVE_GOLD} gp instead
+                        </button>
+                      </div>
+                      {equipment.toolOptions && !chosenTool && (
+                        <p className="text-xs text-gray-500">
+                          Choose your tool proficiency above to add the package.
+                        </p>
+                      )}
+                    </>
+                  )}
+                </div>
+              )}
             </div>
 
             {/* Feat Suggestions */}

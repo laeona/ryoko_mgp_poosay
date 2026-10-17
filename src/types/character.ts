@@ -27,6 +27,8 @@ export interface Character {
     ideal?: string;
     bond?: string;
     flaw?: string;
+    /** Which starting equipment option was taken, so it isn't added twice. */
+    equipmentChoice?: 'package' | 'gold';
   };
   feats: string[];
   /** Choices made for feats (e.g. which ability a feat increases), keyed by feat name. */
@@ -115,6 +117,8 @@ export interface InventoryItem {
   description?: string;
   damage?: string;
   properties?: string[];
+  /** Where the item came from, e.g. 'background' for starting equipment. */
+  source?: string;
 }
 
 export interface CombatData {

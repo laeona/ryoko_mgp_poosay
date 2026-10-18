@@ -4,9 +4,10 @@ import CharacterList from './components/CharacterList';
 import CharacterBuilder from './components/builder/CharacterBuilder';
 import CharacterSheet from './components/sheet/CharacterSheet';
 import SettingPage from './components/SettingPage';
+import MapsPage from './components/MapsPage';
 import DiceRoller from './components/shared/DiceRoller';
 
-type View = 'list' | 'builder' | 'sheet' | 'setting';
+type View = 'list' | 'builder' | 'sheet' | 'setting' | 'maps';
 type Theme = 'day' | 'night';
 
 function getInitialTheme(): Theme {
@@ -147,6 +148,18 @@ function App() {
               <span className="font-display" aria-hidden="true">界</span>
               <span className="text-sm font-semibold">World</span>
             </button>
+            <button
+              type="button"
+              onClick={() => {
+                setEditingId(null);
+                setView('maps');
+              }}
+              className="theme-toggle"
+              aria-current={view === 'maps' ? 'page' : undefined}
+            >
+              <span className="font-display" aria-hidden="true">図</span>
+              <span className="text-sm font-semibold">Maps</span>
+            </button>
             {view !== 'list' && (
               <button
                 onClick={handleBack}
@@ -171,6 +184,7 @@ function App() {
           <CharacterBuilder onDone={handleDone} onCancel={handleBack} />
         )}
         {view === 'setting' && <SettingPage />}
+        {view === 'maps' && <MapsPage />}
         {view === 'sheet' && editingId && (
           <CharacterSheet characterId={editingId} />
         )}

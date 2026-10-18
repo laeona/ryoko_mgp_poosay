@@ -25,12 +25,18 @@ import {
   getModifier,
   getFeatBonuses,
   getFeatSpeedBonus,
-  getProficiencyBonus,
   getRacialBonuses,
+  getTotalAbilityScores,
 } from '../../utils/calculations';
 import { formatModifier } from '../../utils/dice';
 import Rollable from '../shared/Rollable';
-import { COMMON_RESOURCES } from '../../data/restResources';
+import { COMMON_RESOURCES, getResourceMax } from '../../data/restResources';
+import {
+  getNaturalArmourTrait,
+  getRaceResourceNames,
+  getRaceSpeed,
+  getRaceSpeedNote,
+} from '../../utils/raceMechanics';
 
 interface Props {
   characterId: string;
@@ -91,22 +97,68 @@ export default function CharacterSheet({ characterId }: Props) {
     (character?.feats ?? []).join(','),
   ]);
 
-  // Keep proficiency-bonus resources (feat uses) in step with character level
+  // Keep proficiency-based resources (feat and racial uses) in step with level
   useEffect(() => {
     if (!character) return;
-    const pb = getProficiencyBonus(character.level);
-    const scaling = new Set(
-      COMMON_RESOURCES.filter((t) => t.scalesWithProficiency).map((t) => t.name)
-    );
+    const targets = new Map<string, number>();
+    for (const t of COMMON_RESOURCES) {
+      if (t.scalesWithProficiency || t.scalesWithHalfProficiency) {
+        targets.set(t.name, getResourceMax(t, character.level));
+      }
+    }
     const resources = character.resources ?? [];
-    if (!resources.some((r) => scaling.has(r.name) && r.max !== pb)) return;
+    if (!resources.some((r) => targets.has(r.name) && r.max !== targets.get(r.name))) return;
     updateCharacter(character.id, {
       resources: resources.map((r) =>
-        scaling.has(r.name) && r.max !== pb ? { ...r, max: pb } : r
+        targets.has(r.name) && r.max !== targets.get(r.name)
+          ? { ...r, max: targets.get(r.name) as number }
+          : r
       ),
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [character?.level]);
+
+  // Race sets the base walking speed. Anything the player added by hand stays.
+  useEffect(() => {
+    if (!character) return;
+    const target = getRaceSpeed(character);
+    const applied = character.combat.raceSpeedApplied ?? 30;
+    if (applied === target) return;
+    updateCharacter(character.id, {
+      combat: {
+        ...character.combat,
+        speed: character.combat.speed + target - applied,
+        raceSpeedApplied: target,
+      },
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [character?.race.name, character?.race.subrace]);
+
+  // Racial limited-use traits get their own trackers in Resources
+  useEffect(() => {
+    if (!character) return;
+    const wanted = getRaceResourceNames(character);
+    const resources = character.resources ?? [];
+    const keep = resources.filter((r) => r.source !== 'race' || wanted.includes(r.name));
+    const missing = wanted.filter((n) => !keep.some((r) => r.name === n));
+    if (keep.length === resources.length && missing.length === 0) return;
+    const added = missing.flatMap((name) => {
+      const t = COMMON_RESOURCES.find((x) => x.name === name);
+      if (!t) return [];
+      return [
+        {
+          id: crypto.randomUUID(),
+          name: t.name,
+          max: getResourceMax(t, character.level),
+          used: 0,
+          rechargeOn: t.rechargeOn,
+          source: 'race' as const,
+        },
+      ];
+    });
+    updateCharacter(character.id, { resources: [...keep, ...added] });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [character?.race.name, character?.race.subrace]);
 
   return (
     <div>
@@ -221,6 +273,13 @@ function OverviewTab({ characterId }: { characterId: string }) {
   const featSpeedBonus = getFeatSpeedBonus(character);
 
   const initiative = getInitiative(character);
+
+  const naturalArmourTrait = getNaturalArmourTrait(character);
+  const conMod = getModifier(getTotalAbilityScores(character).constitution);
+  const brittleShell = (character.resources ?? []).find((r) => r.name === 'Brittle Shell');
+  const brittleBonus = brittleShell && brittleShell.used < brittleShell.max ? 2 : 0;
+  const naturalAC = 12 + conMod + brittleBonus;
+  const raceSpeedNote = getRaceSpeedNote(character);
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
@@ -354,6 +413,24 @@ function OverviewTab({ characterId }: { characterId: string }) {
               }
               className="w-full border border-gray-300 rounded px-2 py-1"
             />
+            {naturalArmourTrait && (
+              <div className="text-xs text-jade font-semibold mt-0.5">
+                {naturalArmourTrait}: 12 + Con{brittleBonus ? ' + 2 shell' : ''} = {naturalAC}{' '}
+                {character.combat.armorClass !== naturalAC && (
+                  <button
+                    type="button"
+                    onClick={() =>
+                      updateCharacter(character.id, {
+                        combat: { ...character.combat, armorClass: naturalAC },
+                      })
+                    }
+                    className="underline hover:text-green-800"
+                  >
+                    Use
+                  </button>
+                )}
+              </div>
+            )}
           </div>
           <div>
             <label className="block text-xs uppercase font-semibold text-gray-500">
@@ -376,6 +453,9 @@ function OverviewTab({ characterId }: { characterId: string }) {
               <div className="text-xs text-jade font-semibold mt-0.5">
                 +{featSpeedBonus} ft. from feats = {character.combat.speed + featSpeedBonus} ft.
               </div>
+            )}
+            {raceSpeedNote && (
+              <div className="text-xs text-gray-500 mt-0.5">{raceSpeedNote}</div>
             )}
           </div>
             <div className="col-span-2">

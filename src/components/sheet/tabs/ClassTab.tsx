@@ -120,7 +120,6 @@ export default function ClassTab({ characterId }: Props) {
             classLevel={cl}
             onUpdate={(updates) => updateClass(i, updates)}
             onRemove={() => removeClass(i)}
-            canRemove={character.classes.length > 1}
           />
         ))
       )}
@@ -134,15 +133,9 @@ interface ClassCardProps {
   classLevel: ClassLevel;
   onUpdate: (updates: Partial<ClassLevel>) => void;
   onRemove: () => void;
-  canRemove: boolean;
 }
 
-function ClassCard({
-  classLevel,
-  onUpdate,
-  onRemove,
-  canRemove,
-}: ClassCardProps) {
+function ClassCard({ classLevel, onUpdate, onRemove }: ClassCardProps) {
   const cls: DnDClass | undefined = getClass(classLevel.className);
   if (!cls) return null;
 
@@ -218,16 +211,14 @@ function ClassCard({
               +
             </button>
           </div>
-          {canRemove && (
-            <button
-              onClick={() => {
-                if (confirm(`Remove ${cls.name}?`)) onRemove();
-              }}
-              className="px-2 py-1 text-xs bg-red-100 text-red-700 rounded hover:bg-red-200"
-            >
-              Remove
-            </button>
-          )}
+          <button
+            onClick={() => {
+              if (confirm(`Remove ${cls.name}?`)) onRemove();
+            }}
+            className="px-2 py-1 text-xs bg-red-100 text-red-700 rounded hover:bg-red-200"
+          >
+            Remove
+          </button>
         </div>
       </div>
 

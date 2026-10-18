@@ -141,6 +141,8 @@ export interface CombatData {
   armorClass: number;
   initiative: number;
   speed: number;
+  /** Race base speed already folded into `speed` (so manual adjustments survive a race change). */
+  raceSpeedApplied?: number;
   conditions: string[];
   hpRolledValues: number[];
 }
@@ -151,6 +153,8 @@ export interface Resource {
   max: number;
   used: number;
   rechargeOn: 'short' | 'long' | 'dawn' | 'none';
+  /** Added automatically by the character's race; removed if the race changes. */
+  source?: 'race';
 }
 
 export interface Feature {

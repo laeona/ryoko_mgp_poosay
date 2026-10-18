@@ -10,11 +10,15 @@ export interface ResourceTemplate {
   feats?: string[];
   /** Max equals your proficiency bonus and follows it as you level. */
   scalesWithProficiency?: boolean;
+  /** Max equals half your proficiency bonus (rounded down, minimum 1). */
+  scalesWithHalfProficiency?: boolean;
 }
 
 /** Starting maximum for a resource, given the character's level. */
 export function getResourceMax(tmpl: ResourceTemplate, level: number): number {
-  return tmpl.scalesWithProficiency ? getProficiencyBonus(level) : tmpl.defaultMax;
+  if (tmpl.scalesWithProficiency) return getProficiencyBonus(level);
+  if (tmpl.scalesWithHalfProficiency) return Math.max(1, Math.floor(getProficiencyBonus(level) / 2));
+  return tmpl.defaultMax;
 }
 
 export const COMMON_RESOURCES: ResourceTemplate[] = [
@@ -41,12 +45,21 @@ export const COMMON_RESOURCES: ResourceTemplate[] = [
   { name: 'Mystic Arcanum', rechargeOn: 'long', defaultMax: 1, description: 'Warlock. Cast a spell of 6th+ level once per long rest.' },
   // Racial / Feats
   { name: 'Essence Capture', rechargeOn: 'long', defaultMax: 1, description: 'Hanamori. Capture essence from a dying creature.' },
-  { name: 'Fortune Favoured', rechargeOn: 'long', defaultMax: 1, description: 'Isetsu. Reroll a missed attack or failed save.' },
-  { name: 'Chest Beating', rechargeOn: 'long', defaultMax: 2, description: 'Hulking Enkoh. Resistance + Intimidation.' },
+  { name: 'Fortune Favoured', rechargeOn: 'long', defaultMax: 1, description: 'Isetsu. Reroll a missed attack, failed check or failed save. Uses equal to half your proficiency bonus.', scalesWithHalfProficiency: true },
+  { name: 'Chest Beating', rechargeOn: 'long', defaultMax: 2, description: 'Hulking Enkoh. Bonus action: resistance to bludgeoning, piercing and slashing until your next turn, plus advantage on Intimidation.', scalesWithProficiency: true },
   { name: 'Ascendant Form', rechargeOn: 'long', defaultMax: 1, description: 'Kitsune. Radiate light and empower allies.' },
+  { name: 'Water Magic', rechargeOn: 'long', defaultMax: 2, description: 'Fuyoren. 10-minute ritual to imbue a vial of water (holy water, antidote, hydration or 1d4 healing). Uses equal to proficiency bonus.', scalesWithProficiency: true },
+  { name: 'Brittle Shell', rechargeOn: 'short', defaultMax: 1, description: 'Isetsu. +2 AC after a short or long rest. Mark it used when an attack hits you; it returns on a short rest.' },
+  { name: 'Tough Shell (Fall)', rechargeOn: 'long', defaultMax: 1, description: 'Ryokido. Reaction: subtract up to 100 feet from a fall when calculating damage.' },
+  { name: 'Slumbering Dragon', rechargeOn: 'short', defaultMax: 2, description: 'Nishikin. Reaction: add 1d6 to an attack, check or save using your Koi Dragon Colour ability. Uses equal to proficiency bonus, per short or long rest.', scalesWithProficiency: true },
+  { name: 'Compassionate Heart', rechargeOn: 'long', defaultMax: 2, description: 'Blue Oniborne. Take the Help action as a bonus action; may spend a Hit Die to grant temp HP. Uses equal to proficiency bonus.', scalesWithProficiency: true },
+  { name: 'Savage Bite', rechargeOn: 'long', defaultMax: 2, description: 'Blue Oniborne. Reaction bite when damaged by a creature within 5 ft; crits on 18-20. Uses equal to proficiency bonus.', scalesWithProficiency: true },
+  { name: 'Ghastly Visage', rechargeOn: 'long', defaultMax: 2, description: 'Green Oniborne. Bonus action after Attack: frighten a creature within 5 ft (Wis save, DC 8 + Con + proficiency). Uses equal to proficiency bonus.', scalesWithProficiency: true },
+  { name: 'Whirlwind Onslaught', rechargeOn: 'short', defaultMax: 1, description: 'Hanataka Tengu. Bonus action after Attack: cast a cantrip or make melee attacks against several creatures.' },
+  { name: 'Psychic Battery', rechargeOn: 'short', defaultMax: 1, description: 'Karasu Tengu. Replace one attack with a psychic assault (DC 8 + Con + proficiency) that confuses on a fail.' },
   { name: 'Moonblessed', rechargeOn: 'long', defaultMax: 1, description: 'Nishikin. Spend Hit Dice to heal in moonlight.' },
   { name: 'Cloudstep', rechargeOn: 'long', defaultMax: 1, description: 'Ryujin. Conjure a small cloud to fly.' },
-  { name: 'Heartening Breath', rechargeOn: 'long', defaultMax: 2, description: 'Ryujin. Buff allies with a breath cone.' },
+  { name: 'Heartening Breath', rechargeOn: 'long', defaultMax: 2, description: 'Ryujin. Action: 30 ft cone, add 1d4 to your colour ability for you and chosen allies. Uses equal to proficiency bonus.', scalesWithProficiency: true },
   { name: 'Boon of Ashura', rechargeOn: 'long', defaultMax: 2, description: 'Feat. Extra reaction.', feats: ['Boon of Ashura'], scalesWithProficiency: true },
   { name: 'Boon of the Nue', rechargeOn: 'short', defaultMax: 2, description: 'Feat. Roll d6, bonus or poison.', feats: ['Boon of the Nue'], scalesWithProficiency: true },
   { name: 'Boon of the Ōmukade', rechargeOn: 'long', defaultMax: 2, description: 'Feat. Resistance reaction.', feats: ['Boon of the Ōmukade'], scalesWithProficiency: true },

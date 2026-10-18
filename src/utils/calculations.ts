@@ -4,6 +4,7 @@ import type {
   Character,
 } from '../types/character';
 import { getRace } from '../data/races';
+import { getRaceSkillProficiencies } from './raceMechanics';
 import { getClass } from '../data/classes';
 import { FEATS } from '../data/feats';
 
@@ -210,6 +211,7 @@ export function isProficientInSkill(
     character.background.skills.includes(skill) ||
     character.skillProficiencies.includes(skill) ||
     getFeatSkillProficiencies(character).includes(skill) ||
+    getRaceSkillProficiencies(character).includes(skill) ||
     // Actor feat: proficiency (and expertise) in Deception and Performance
     ((character.feats ?? []).includes('Actor') &&
       (skill === 'Deception' || skill === 'Performance'))

@@ -1,5 +1,17 @@
+import { useState } from 'react';
 import { useCharacterStore } from '../../../store/characterStore';
-import { KAIJU_ASPECTS } from '../../../data/kaijuAspects';
+import {
+  KAIJU_NAMES,
+  getAspectBenefit,
+  getKaijuForce,
+  getTransformation,
+} from '../../../data/kaijuAspects';
+import type { RageContext } from '../../../data/kaijuAspects';
+import {
+  getModifier,
+  getProficiencyBonus,
+  getTotalAbilityScores,
+} from '../../../utils/calculations';
 
 interface Props {
   characterId: string;
@@ -11,6 +23,8 @@ export default function RagePanel({ characterId }: Props) {
     s.characters.find((c) => c.id === characterId)
   );
   const updateCharacter = useCharacterStore((s) => s.updateCharacter);
+  const [aspect, setAspect] = useState<string | null>(null);
+  const [form, setForm] = useState<string>('same');
 
   if (!character) return null;
   const barb = character.classes.find((c) => c.className === 'Barbarian');
@@ -24,12 +38,30 @@ export default function RagePanel({ characterId }: Props) {
   const remaining = rageRes ? rageRes.max - rageRes.used : 0;
   const canStart = !raging && !!rageRes && (rageRes.unlimited || remaining > 0);
 
-  const startRage = (aspect?: string) => {
+  const totals = getTotalAbilityScores(character);
+  const ctx: RageContext = {
+    level: barb.level,
+    strMod: getModifier(totals.strength),
+    conMod: getModifier(totals.constitution),
+    pb: getProficiencyBonus(character.level),
+  };
+
+  const chosen = aspect ?? rage?.lastAspect ?? KAIJU_NAMES[0];
+  const chosenForm = form === 'same' ? chosen : form;
+
+  const startRage = () => {
     updateCharacter(character.id, {
       resources: resources.map((r) =>
         r.name === 'Rage' && !r.unlimited ? { ...r, used: Math.min(r.max, r.used + 1) } : r
       ),
-      rage: { active: true, aspect, lastAspect: aspect ?? rage?.lastAspect },
+      rage: kaijuPath
+        ? {
+            active: true,
+            aspect: chosen,
+            form: barb.level >= 10 ? chosenForm : undefined,
+            lastAspect: chosen,
+          }
+        : { active: true, lastAspect: rage?.lastAspect },
     });
   };
 
@@ -38,8 +70,6 @@ export default function RagePanel({ characterId }: Props) {
       rage: { active: false, lastAspect: rage?.lastAspect },
     });
   };
-
-  const activeAspect = KAIJU_ASPECTS.find((a) => a.name === rage?.aspect);
 
   return (
     <div
@@ -66,41 +96,83 @@ export default function RagePanel({ characterId }: Props) {
       </div>
 
       {raging ? (
-        <p className="text-xs text-gray-700">
-          {activeAspect?.benefits ||
-            (rage?.aspect
-              ? `Aspect rules for ${rage.aspect} haven't been added to the app yet. See your Path of the Kaiju notes.`
-              : 'Advantage on Strength checks and saves, bonus melee damage, and resistance to physical damage.')}
-        </p>
+        <div className="text-xs text-gray-700 space-y-2">
+          <p>
+            Advantage on Strength checks and saves, bonus melee damage, and resistance to
+            bludgeoning, piercing and slashing damage.
+          </p>
+          {rage?.aspect && (
+            <>
+              <p>
+                <span className="font-semibold">Aspect, {rage.aspect}: </span>
+                {getAspectBenefit(rage.aspect, ctx)}
+              </p>
+              {barb.level >= 6 && <p>{getKaijuForce(ctx)}</p>}
+              {barb.level >= 10 && (
+                <p>
+                  <span className="font-semibold">
+                    Transformation, {rage.form ?? rage.aspect}:{' '}
+                  </span>
+                  {getTransformation(rage.form ?? rage.aspect, ctx)}
+                </p>
+              )}
+            </>
+          )}
+        </div>
       ) : kaijuPath ? (
-        <>
-          <p className="text-xs text-gray-600 mb-2">
+        <div className="space-y-2">
+          <p className="text-xs text-gray-600">
             Choose the kaiju aspect to channel for this rage. Starting spends one use of Rage.
           </p>
           <div className="flex flex-wrap gap-2">
-            {KAIJU_ASPECTS.map((a) => (
+            {KAIJU_NAMES.map((n) => (
               <button
-                key={a.name}
+                key={n}
                 type="button"
-                disabled={!canStart}
-                onClick={() => startRage(a.name)}
-                title={a.benefits || undefined}
-                className={`px-3 py-1.5 text-sm rounded border-2 font-semibold transition disabled:opacity-40 ${
-                  rage?.lastAspect === a.name
-                    ? 'border-ember text-ember'
+                onClick={() => setAspect(n)}
+                aria-pressed={chosen === n}
+                className={`px-3 py-1.5 text-sm rounded border-2 font-semibold transition ${
+                  chosen === n
+                    ? 'border-ember bg-ember text-white'
                     : 'border-gray-300 hover:border-ember'
                 }`}
               >
-                {a.name}
+                {n}
               </button>
             ))}
           </div>
-        </>
+          <p className="text-xs text-gray-700">{getAspectBenefit(chosen, ctx)}</p>
+          {barb.level >= 10 && (
+            <label className="flex items-center gap-2 text-xs">
+              <span className="font-semibold">Transformation form</span>
+              <select
+                value={form}
+                onChange={(e) => setForm(e.target.value)}
+                className="border border-gray-300 rounded px-2 py-1"
+              >
+                <option value="same">Same as aspect ({chosen})</option>
+                {KAIJU_NAMES.filter((n) => n !== chosen).map((n) => (
+                  <option key={n} value={n}>
+                    {n}
+                  </option>
+                ))}
+              </select>
+            </label>
+          )}
+          <button
+            type="button"
+            disabled={!canStart}
+            onClick={startRage}
+            className="px-3 py-1.5 text-sm bg-ember text-white rounded hover:bg-red-700 font-semibold disabled:opacity-40"
+          >
+            Start Rage as {chosen}
+          </button>
+        </div>
       ) : (
         <button
           type="button"
           disabled={!canStart}
-          onClick={() => startRage()}
+          onClick={startRage}
           className="px-3 py-1.5 text-sm bg-ember text-white rounded hover:bg-red-700 font-semibold disabled:opacity-40"
         >
           Start Rage

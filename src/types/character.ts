@@ -51,7 +51,7 @@ export interface Character {
   /** Character picture, stored as a small JPEG data URL so it travels with exports. */
   portrait?: string;
   /** Barbarian rage state: whether raging now, and the kaiju aspect chosen for this rage. */
-  rage?: { active: boolean; aspect?: string; lastAspect?: string };
+  rage?: { active: boolean; aspect?: string; form?: string; lastAspect?: string };
   /** Free-form notes the player adds on the Notes tab. */
   noteEntries?: NoteEntry[];
   activeTab: string;

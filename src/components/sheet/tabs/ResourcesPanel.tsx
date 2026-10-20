@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useCharacterStore } from '../../../store/characterStore';
 import { COMMON_RESOURCES, getResourceMax } from '../../../data/restResources';
 import { getResourceHelp } from '../../../data/classResources';
+import RagePanel from './RagePanel';
 import type { Resource } from '../../../types/character';
 
 interface Props {
@@ -53,6 +54,8 @@ export default function ResourcesPanel({ characterId }: Props) {
           {showPicker ? 'Close' : '+ Add'}
         </button>
       </div>
+
+      <RagePanel characterId={character.id} />
 
       {/* Picker */}
       {showPicker && (

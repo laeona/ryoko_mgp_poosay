@@ -39,7 +39,7 @@ const DEFS: ClassResourceDef[] = [
     recharge: 'long',
     max: ({ level }) => (level >= 20 ? 'unlimited' : byLevel(level, [[1, 2], [3, 3], [6, 4], [12, 5], [17, 6]])),
     usage:
-      'Bonus action to start. While raging you have advantage on Strength checks and saves, bonus melee damage, and resistance to physical damage. Each use is one rage. See the Features tab for the exact numbers.',
+      'Bonus action to start. While raging you have advantage on Strength checks and saves, bonus melee damage, and resistance to physical damage. Each use is one rage. Path of the Kaiju barbarians choose a kaiju aspect each time they rage, using the Rage panel above. See the Features tab for the exact numbers.',
   },
   // ---- Bard
   {

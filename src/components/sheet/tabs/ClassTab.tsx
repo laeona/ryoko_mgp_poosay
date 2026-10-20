@@ -150,8 +150,9 @@ function ClassCard({ classLevel, onUpdate, onRemove }: ClassCardProps) {
     .filter((f) => f.level <= classLevel.level)
     .sort((a, b) => a.level - b.level);
 
+  // The kaiju aspect is chosen each time you rage, on the Overview
   const visibleChoices = cls.choices?.filter(
-    (c) => classLevel.level >= c.level
+    (c) => classLevel.level >= c.level && c.id !== 'barbarian-kaiju-aspect'
   );
 
   return (

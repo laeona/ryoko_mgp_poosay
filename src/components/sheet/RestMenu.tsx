@@ -109,6 +109,10 @@ export default function RestMenu({ characterId }: Props) {
       resources: updatedResources,
       spellcasting: updatedSpellcasting,
       combat: updatedCombat,
+      // Resting ends any rage
+      ...(character.rage?.active
+        ? { rage: { ...character.rage, active: false } }
+        : {}),
     });
 
     setOpen(false);

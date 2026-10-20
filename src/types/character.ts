@@ -153,8 +153,10 @@ export interface Resource {
   max: number;
   used: number;
   rechargeOn: 'short' | 'long' | 'dawn' | 'none';
-  /** Added automatically by the character's race; removed if the race changes. */
-  source?: 'race';
+  /** Added automatically from the character's race or class; removed if that no longer applies. */
+  source?: 'race' | 'class';
+  /** True for features with no use limit at this level (e.g. a 20th-level Barbarian's Rage). */
+  unlimited?: boolean;
 }
 
 export interface Feature {

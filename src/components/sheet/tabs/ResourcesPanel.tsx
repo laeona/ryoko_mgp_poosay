@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useCharacterStore } from '../../../store/characterStore';
 import { COMMON_RESOURCES, getResourceMax } from '../../../data/restResources';
+import { getResourceHelp } from '../../../data/classResources';
 import type { Resource } from '../../../types/character';
 
 interface Props {
@@ -99,7 +100,7 @@ export default function ResourcesPanel({ characterId }: Props) {
       {/* List */}
       {resources.length === 0 ? (
         <p className="text-sm text-gray-500 text-center py-4">
-          No resources yet. Click + Add to track Rage, Ki, Bardic Inspiration, etc.
+          No resources yet. Class, race and feat abilities with limited uses appear here automatically. Click + Add to track anything else.
         </p>
       ) : (
         <div className="space-y-2">
@@ -107,6 +108,7 @@ export default function ResourcesPanel({ characterId }: Props) {
             <ResourceRow
               key={r.id}
               resource={r}
+              help={getResourceHelp(character, r.name)}
               onUpdate={(u) => updateResource(r.id, u)}
               onRemove={() => removeResource(r.id)}
             />
@@ -119,79 +121,112 @@ export default function ResourcesPanel({ characterId }: Props) {
 
 function ResourceRow({
   resource,
+  help,
   onUpdate,
   onRemove,
 }: {
   resource: Resource;
+  help?: string;
   onUpdate: (u: Partial<Resource>) => void;
   onRemove: () => void;
 }) {
+  const [showHelp, setShowHelp] = useState(false);
   const remaining = resource.max - resource.used;
+  const auto = resource.source === 'class';
 
   return (
-    <div className="flex items-center gap-2 border-b border-gray-100 pb-2">
-      <input
-        value={resource.name}
-        onChange={(e) => onUpdate({ name: e.target.value })}
-        className="flex-1 font-semibold text-sm border-b border-transparent hover:border-gray-300 focus:border-ember outline-none min-w-[100px]"
-      />
+    <div className="border-b border-gray-100 pb-2">
+      <div className="flex items-center gap-2 flex-wrap">
+        <input
+          value={resource.name}
+          onChange={(e) => onUpdate({ name: e.target.value })}
+          className="flex-1 font-semibold text-sm border-b border-transparent hover:border-gray-300 focus:border-ember outline-none min-w-[100px]"
+        />
 
-      <select
-        value={resource.rechargeOn}
-        onChange={(e) =>
-          onUpdate({ rechargeOn: e.target.value as Resource['rechargeOn'] })
-        }
-        className="text-xs border border-gray-300 rounded px-1 py-0.5"
-        title="Recharge timing"
-      >
-        <option value="short">⚡ Short</option>
-        <option value="long">🌙 Long</option>
-        <option value="dawn">☀️ Dawn</option>
-        <option value="none">— Never</option>
-      </select>
+        {help && (
+          <button
+            type="button"
+            onClick={() => setShowHelp(!showHelp)}
+            aria-expanded={showHelp}
+            title="How to use this"
+            className="w-5 h-5 rounded-full text-xs font-bold bg-gray-100 hover:bg-gray-200 text-gray-600"
+          >
+            ?
+          </button>
+        )}
 
-      <input
-        type="number"
-        min={0}
-        value={resource.max}
-        onChange={(e) =>
-          onUpdate({ max: parseInt(e.target.value) || 0 })
-        }
-        className="w-12 text-center text-sm border border-gray-300 rounded px-1 py-0.5"
-        title="Max"
-      />
-
-      <div className="flex items-center gap-1">
-        <button
-          onClick={() =>
-            onUpdate({ used: Math.max(0, resource.used - 1) })
+        <select
+          value={resource.rechargeOn}
+          onChange={(e) =>
+            onUpdate({ rechargeOn: e.target.value as Resource['rechargeOn'] })
           }
-          disabled={remaining >= resource.max}
-          className="w-6 h-6 rounded bg-gray-100 hover:bg-gray-200 text-xs font-bold disabled:opacity-30"
+          disabled={auto}
+          className="text-xs border border-gray-300 rounded px-1 py-0.5 disabled:bg-gray-50"
+          title={auto ? 'Set by your class' : 'Recharge timing'}
         >
-          +
-        </button>
-        <span className="text-sm font-bold w-12 text-center">
-          {remaining} / {resource.max}
-        </span>
+          <option value="short">⚡ Short</option>
+          <option value="long">🌙 Long</option>
+          <option value="dawn">☀️ Dawn</option>
+          <option value="none">— Never</option>
+        </select>
+
+        {resource.unlimited ? (
+          <span className="text-sm font-bold px-2 text-jade" title="No limit at your level">
+            ∞ Unlimited
+          </span>
+        ) : (
+          <>
+            <input
+              type="number"
+              min={0}
+              value={resource.max}
+              disabled={auto}
+              onChange={(e) =>
+                onUpdate({ max: parseInt(e.target.value) || 0 })
+              }
+              className="w-12 text-center text-sm border border-gray-300 rounded px-1 py-0.5 disabled:bg-gray-50"
+              title={auto ? 'Set automatically from your class level and abilities' : 'Max'}
+            />
+
+            <div className="flex items-center gap-1">
+              <button
+                onClick={() =>
+                  onUpdate({ used: Math.max(0, resource.used - 1) })
+                }
+                disabled={remaining >= resource.max}
+                className="w-6 h-6 rounded bg-gray-100 hover:bg-gray-200 text-xs font-bold disabled:opacity-30"
+                title="Regain one use"
+              >
+                +
+              </button>
+              <span className="text-sm font-bold w-14 text-center">
+                {remaining} / {resource.max}
+              </span>
+              <button
+                onClick={() =>
+                  onUpdate({ used: Math.min(resource.max, resource.used + 1) })
+                }
+                disabled={remaining === 0}
+                className="w-6 h-6 rounded bg-gray-100 hover:bg-gray-200 text-xs font-bold disabled:opacity-30"
+                title="Spend one use"
+              >
+                −
+              </button>
+            </div>
+          </>
+        )}
+
         <button
-          onClick={() =>
-            onUpdate({ used: Math.min(resource.max, resource.used + 1) })
-          }
-          disabled={remaining === 0}
-          className="w-6 h-6 rounded bg-gray-100 hover:bg-gray-200 text-xs font-bold disabled:opacity-30"
+          onClick={onRemove}
+          className="text-xs text-red-500 hover:text-red-700"
+          title="Remove"
         >
-          −
+          ✕
         </button>
       </div>
-
-      <button
-        onClick={onRemove}
-        className="text-xs text-red-500 hover:text-red-700"
-        title="Remove"
-      >
-        ✕
-      </button>
+      {showHelp && help && (
+        <p className="text-xs text-gray-600 mt-1 bg-gray-50 rounded p-2">{help}</p>
+      )}
     </div>
   );
 }

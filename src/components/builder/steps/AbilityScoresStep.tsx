@@ -62,7 +62,31 @@ export default function AbilityScoresStep({ character }: Props) {
   const handleStandardAssign = (key: AbilityScoreKey, value: number | null) => {
     const next = { ...assignments, [key]: value };
     setAssignments(next);
-    if (value !== null) setScore(key, value);
+    // Clearing a slot also clears its score so it can't linger unassigned
+    setScore(key, value ?? 0);
+  };
+
+  const resetStandard = () => {
+    setAssignments({
+      strength: null,
+      dexterity: null,
+      constitution: null,
+      intelligence: null,
+      wisdom: null,
+      charisma: null,
+    });
+    ABILITY_KEYS.forEach((k) => setScore(k, 0));
+  };
+
+  /** Click a used value to unassign it, or an available one to give it to the next empty ability. */
+  const handleChipClick = (value: number, available: boolean) => {
+    if (available) {
+      const target = ABILITY_KEYS.find((k) => assignments[k] === null);
+      if (target) handleStandardAssign(target, value);
+      return;
+    }
+    const holder = ABILITY_KEYS.find((k) => assignments[k] === value);
+    if (holder) handleStandardAssign(holder, null);
   };
 
   const handlePointBuy = (key: AbilityScoreKey, delta: number) => {
@@ -173,25 +197,45 @@ export default function AbilityScoresStep({ character }: Props) {
       {/* Standard Array pool */}
       {method === 'standard' && (
         <div className="bg-white rounded p-3">
-          <div className="text-xs uppercase text-gray-500 font-semibold mb-2">
-            Available Values
+          <div className="flex items-center justify-between mb-2">
+            <span className="text-xs uppercase text-gray-500 font-semibold">
+              Available Values
+            </span>
+            <button
+              type="button"
+              onClick={resetStandard}
+              disabled={assignedValues.length === 0}
+              className="px-3 py-1 text-xs bg-gray-100 text-gray-700 rounded hover:bg-gray-200 disabled:opacity-40"
+            >
+              Reset all
+            </button>
           </div>
+          <p className="text-xs text-gray-500 mb-2">
+            Pick a value from each ability's dropdown, or click a value here to assign it to the next empty ability. Click a crossed-out value to unassign it.
+          </p>
           <div className="flex flex-wrap gap-2">
             {STANDARD_ARRAY.map((v) => {
               const usedCount = assignedValues.filter((a) => a === v).length;
               const totalCount = STANDARD_ARRAY.filter((s) => s === v).length;
               const available = usedCount < totalCount;
               return (
-                <div
+                <button
+                  type="button"
                   key={v}
-                  className={`px-3 py-1 rounded border-2 text-sm font-bold ${
+                  onClick={() => handleChipClick(v, available)}
+                  title={
                     available
-                      ? 'border-jade text-jade'
-                      : 'border-gray-200 text-gray-300 line-through'
+                      ? 'Click to assign to the next empty ability'
+                      : 'Click to unassign'
+                  }
+                  className={`px-3 py-1 rounded border-2 text-sm font-bold transition ${
+                    available
+                      ? 'border-jade text-jade hover:bg-jade/10'
+                      : 'border-gray-300 text-gray-400 line-through hover:border-ember hover:text-ember'
                   }`}
                 >
                   {v}
-                </div>
+                </button>
               );
             })}
           </div>

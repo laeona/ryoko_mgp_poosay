@@ -30,10 +30,9 @@ import {
 } from '../../utils/calculations';
 import { formatModifier } from '../../utils/dice';
 import Rollable from '../shared/Rollable';
-import { COMMON_RESOURCES, getResourceMax } from '../../data/restResources';
+import { syncResources } from '../../data/classResources';
 import {
   getNaturalArmourTrait,
-  getRaceResourceNames,
   getRaceSpeed,
   getRaceSpeedNote,
 } from '../../utils/raceMechanics';
@@ -97,26 +96,21 @@ export default function CharacterSheet({ characterId }: Props) {
     (character?.feats ?? []).join(','),
   ]);
 
-  // Keep proficiency-based resources (feat and racial uses) in step with level
+  // Keep racial, class and level-scaling trackers in Resources in step with the character
   useEffect(() => {
     if (!character) return;
-    const targets = new Map<string, number>();
-    for (const t of COMMON_RESOURCES) {
-      if (t.scalesWithProficiency || t.scalesWithHalfProficiency) {
-        targets.set(t.name, getResourceMax(t, character.level));
-      }
-    }
-    const resources = character.resources ?? [];
-    if (!resources.some((r) => targets.has(r.name) && r.max !== targets.get(r.name))) return;
-    updateCharacter(character.id, {
-      resources: resources.map((r) =>
-        targets.has(r.name) && r.max !== targets.get(r.name)
-          ? { ...r, max: targets.get(r.name) as number }
-          : r
-      ),
-    });
+    const next = syncResources(character);
+    if (JSON.stringify(next) === JSON.stringify(character.resources ?? [])) return;
+    updateCharacter(character.id, { resources: next });
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [character?.level]);
+  }, [
+    character?.level,
+    character?.race.name,
+    character?.race.subrace,
+    character?.classes.map((c) => `${c.className}:${c.level}:${c.subclass ?? ''}`).join(','),
+    JSON.stringify(character?.abilityScores),
+    (character?.feats ?? []).join(','),
+  ]);
 
   // Race sets the base walking speed. Anything the player added by hand stays.
   useEffect(() => {
@@ -134,31 +128,6 @@ export default function CharacterSheet({ characterId }: Props) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [character?.race.name, character?.race.subrace]);
 
-  // Racial limited-use traits get their own trackers in Resources
-  useEffect(() => {
-    if (!character) return;
-    const wanted = getRaceResourceNames(character);
-    const resources = character.resources ?? [];
-    const keep = resources.filter((r) => r.source !== 'race' || wanted.includes(r.name));
-    const missing = wanted.filter((n) => !keep.some((r) => r.name === n));
-    if (keep.length === resources.length && missing.length === 0) return;
-    const added = missing.flatMap((name) => {
-      const t = COMMON_RESOURCES.find((x) => x.name === name);
-      if (!t) return [];
-      return [
-        {
-          id: crypto.randomUUID(),
-          name: t.name,
-          max: getResourceMax(t, character.level),
-          used: 0,
-          rechargeOn: t.rechargeOn,
-          source: 'race' as const,
-        },
-      ];
-    });
-    updateCharacter(character.id, { resources: [...keep, ...added] });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [character?.race.name, character?.race.subrace]);
 
   return (
     <div>

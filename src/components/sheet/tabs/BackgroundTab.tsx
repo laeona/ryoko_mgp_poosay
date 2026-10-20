@@ -379,6 +379,7 @@ function CharacteristicField({
   onChange,
 }: CharFieldProps) {
   const isCustom = value !== '' && !options.includes(value);
+  const isPreset = value !== '' && !isCustom;
   return (
     <div className="bg-gray-50 rounded p-3">
       <div className="text-xs uppercase text-gray-500 font-semibold mb-1">
@@ -395,20 +396,51 @@ function CharacteristicField({
         <option value="">— Choose —</option>
         {options.map((opt, i) => (
           <option key={i} value={opt}>
-            {opt.length > 80 ? opt.slice(0, 77) + '...' : opt}
+            {opt.length > 60 ? opt.slice(0, 57) + '...' : opt}
           </option>
         ))}
         <option value="__custom__">Custom...</option>
       </select>
+
+      {/* The dropdown shortens long entries, so always show the chosen text in full */}
+      {isPreset && (
+        <p className="text-sm text-gray-800 bg-white border border-gray-200 rounded px-2 py-1.5 mb-2 whitespace-pre-wrap">
+          {value}
+        </p>
+      )}
+
       {(isCustom || value === '') && (
         <textarea
           value={value}
           onChange={(e) => onChange(e.target.value)}
           placeholder="Or write your own..."
-          className="w-full border border-gray-300 rounded px-2 py-1 text-sm"
-          rows={2}
+          className="w-full border border-gray-300 rounded px-2 py-1 text-sm mb-2"
+          rows={4}
         />
       )}
+
+      <details>
+        <summary className="text-xs text-gray-500 cursor-pointer select-none">
+          Read all {options.length} options
+        </summary>
+        <ul className="mt-2 space-y-1">
+          {options.map((opt, i) => (
+            <li key={i}>
+              <button
+                type="button"
+                onClick={() => onChange(opt)}
+                className={`w-full text-left text-sm rounded border px-2 py-1.5 transition ${
+                  value === opt
+                    ? 'border-ember bg-ember/10'
+                    : 'border-gray-200 bg-white hover:border-ember'
+                }`}
+              >
+                {opt}
+              </button>
+            </li>
+          ))}
+        </ul>
+      </details>
     </div>
   );
 }

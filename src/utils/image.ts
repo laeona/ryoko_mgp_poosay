@@ -55,3 +55,56 @@ export async function resizeImageToDataUrl(
 
   return canvas.toDataURL('image/jpeg', quality);
 }
+
+/** Which part of an image becomes the portrait: a square centred on (cx, cy), shrunk by `zoom`. */
+export interface PortraitCrop {
+  /** 1 = the largest square that fits; higher values zoom in */
+  zoom: number;
+  /** Crop centre in image pixels */
+  cx: number;
+  cy: number;
+}
+
+/** Decode an image file, respecting EXIF rotation where the browser supports it. */
+export async function loadImageBitmap(file: File): Promise<ImageBitmap> {
+  if (!file.type.startsWith('image/')) {
+    throw new Error('Please choose an image file.');
+  }
+  return createImageBitmap(file, { imageOrientation: 'from-image' });
+}
+
+/** Side length (image pixels) of the square crop at a given zoom. */
+export function cropSide(width: number, height: number, zoom: number): number {
+  return Math.min(width, height) / zoom;
+}
+
+/** Keep the crop centre so the square stays inside the image. */
+export function clampCrop(width: number, height: number, crop: PortraitCrop): PortraitCrop {
+  const half = cropSide(width, height, crop.zoom) / 2;
+  return {
+    zoom: crop.zoom,
+    cx: Math.min(width - half, Math.max(half, crop.cx)),
+    cy: Math.min(height - half, Math.max(half, crop.cy)),
+  };
+}
+
+/** Render the chosen crop as a small JPEG data URL for storing with the character. */
+export function renderPortraitCrop(
+  source: ImageBitmap,
+  crop: PortraitCrop,
+  maxSize = 384,
+  quality = 0.85
+): string {
+  const c = clampCrop(source.width, source.height, crop);
+  const side = cropSide(source.width, source.height, c.zoom);
+  const out = Math.round(Math.min(maxSize, side));
+  const canvas = document.createElement('canvas');
+  canvas.width = out;
+  canvas.height = out;
+  const ctx = canvas.getContext('2d');
+  if (!ctx) throw new Error('Could not process that image.');
+  ctx.fillStyle = '#ffffff';
+  ctx.fillRect(0, 0, out, out);
+  ctx.drawImage(source, c.cx - side / 2, c.cy - side / 2, side, side, 0, 0, out, out);
+  return canvas.toDataURL('image/jpeg', quality);
+}

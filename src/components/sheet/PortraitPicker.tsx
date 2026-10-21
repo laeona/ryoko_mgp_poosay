@@ -1,6 +1,6 @@
 import { useRef, useState } from 'react';
 import { useCharacterStore } from '../../store/characterStore';
-import { resizeImageToDataUrl } from '../../utils/image';
+import PortraitCropper from './PortraitCropper';
 
 interface Props {
   characterId: string;
@@ -14,20 +14,21 @@ export default function PortraitPicker({ characterId }: Props) {
   const updateCharacter = useCharacterStore((s) => s.updateCharacter);
   const fileRef = useRef<HTMLInputElement>(null);
   const [error, setError] = useState('');
+  const [pending, setPending] = useState<File | null>(null);
 
   if (!character) return null;
 
-  const onFile = async (e: React.ChangeEvent<HTMLInputElement>) => {
+  const onFile = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     e.target.value = '';
     if (!file) return;
     setError('');
-    try {
-      const dataUrl = await resizeImageToDataUrl(file);
-      updateCharacter(character.id, { portrait: dataUrl });
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Could not use that image.');
+    if (!file.type.startsWith('image/')) {
+      setError('Please choose an image file.');
+      return;
     }
+    // Let the player zoom and position the picture before it is saved
+    setPending(file);
   };
 
   return (
@@ -63,6 +64,16 @@ export default function PortraitPicker({ characterId }: Props) {
         >
           Remove
         </button>
+      )}
+      {pending && (
+        <PortraitCropper
+          file={pending}
+          onCancel={() => setPending(null)}
+          onSave={(dataUrl) => {
+            updateCharacter(character.id, { portrait: dataUrl });
+            setPending(null);
+          }}
+        />
       )}
       {error && <span className="text-xs text-red-600 max-w-[120px] text-center">{error}</span>}
     </div>

@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
+import { createPortal } from 'react-dom';
 import {
   clampCrop,
   cropSide,
@@ -118,7 +119,8 @@ export default function PortraitCropper({ file, onCancel, onSave }: Props) {
     };
   }
 
-  return (
+  // Render in <body> so no parent card can clip or offset the dialog
+  return createPortal(
     <div
       className="fixed inset-0 z-[100] bg-black/60 flex items-center justify-center p-4"
       role="dialog"
@@ -190,6 +192,7 @@ export default function PortraitCropper({ file, onCancel, onSave }: Props) {
           </button>
         </div>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 }
